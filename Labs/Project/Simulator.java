@@ -70,6 +70,8 @@ public class Simulator {
 
             // log event
             logSequence(currentEvent);
+            System.out.println("========== NEXT ITERATION: ==========");
+            System.out.println("");
             System.out.println("Current Event: " + currentEvent.toString());
             System.out.println("Server of current Event: " + currentEvent.getServers().get(currentEvent.getServers().size()-1));
             System.out.println("");
@@ -83,20 +85,68 @@ public class Simulator {
                 System.out.println("Next Event: " + nextEvent.toString());
                 System.out.println("Server of next Event: " + nextEvent.getServers().get(nextEvent.getServers().size()-1));
                 System.out.println("");
-                System.out.println("");
-                System.out.println("");
+
+                if (customerQueueIterator.hasNext()) {
+
+                    // if ((currentEvent.getState() == 0) && (nextEvent.getState() != 4)) {
+
+                    //     // if there are customers waiting,
+                    //     // add ARRIVE event to the queue
+                    //     System.out.println("CREATING NEW ARRIVE STATE\n");
+                    //     Event newArriveEvent = createArriveEvent(nextEvent.getServers());
+                    //     System.out.println(newArriveEvent);
+                    //     System.out.println(newArriveEvent.getServers());
+                    //     System.out.println("");
+                    //     this.eventQueue.add(newArriveEvent);
                     
-                if ((currentEvent.getState() == 0) && (customerQueueIterator.hasNext())) {
-                    // if there are customers waiting,
-                    // add ARRIVE event to the queue
-                    // System.out.println("CREATING NEW ARRIVE STATE\n");
-                    this.eventQueue.add(createArriveEvent(nextEvent.getServers()));
+                    // } 
+                    
+                    if (currentEvent.getState() > 0) {
+                        
+                        System.out.println("CREATING NEW ARRIVE STATE\n");
+                        Event newArriveEvent = createArriveEvent(currentEvent.getServers());
+                        System.out.println(newArriveEvent);
+                        System.out.println(newArriveEvent.getServers());
+                        System.out.println("");
+                        this.eventQueue.add(newArriveEvent);
+                    }
+
                 }
 
                 // add newly created event to the queue 
                 this.eventQueue.add(nextEvent);
             
-            } 
+            } else {
+                // if its a LEAVE or DONE event, check if next customer
+                // arrives before next upcoming event
+                
+                if (customerQueueIterator.hasNext() && (eventQueueIterator.hasNext())) {
+
+                    // get next event and customer
+                    Customer nextCustomer = customerQueue.poll();
+                    Event upcomingEvent = this.eventQueue.poll();
+                    this.eventQueue.add(upcomingEvent);
+                    customerQueue.add(nextCustomer);
+
+                    double upcomingEventStart = upcomingEvent.getStartTime();
+                    
+
+                    System.out.println("NEXT CUSTOMER: " + nextCustomer);
+                    System.out.println("UPCOMING EVENT START: " + upcomingEventStart);
+
+                    if (nextCustomer.getArrivalTime() < upcomingEventStart) {
+                        // if customer arrives before the next event starts, 
+                        // create ARRIVE event for customer
+                        System.out.println("CREATING NEW ARRIVE STATE\n");
+                        Event newArriveEvent = createArriveEvent(currentEvent.getServers());
+                        System.out.println(newArriveEvent);
+                        System.out.println(newArriveEvent.getServers());
+                        System.out.println("");
+                        this.eventQueue.add(newArriveEvent);
+                    
+                    } 
+                }
+            }
 
         }
 

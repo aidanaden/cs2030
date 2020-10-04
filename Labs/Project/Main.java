@@ -1,17 +1,20 @@
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Scanner;
 
-public class Main {
-
+class Main {
     public static void main(String[] args) {
-
         Scanner sc = new Scanner(System.in);
+
+        List<Double> startTimes = new ArrayList<Double>();
+        int numOfServers = sc.nextInt();
 
         while (sc.hasNextDouble()) {
             double arrivalTime = sc.nextDouble();
+            startTimes.add(arrivalTime);
         }
+
+        Simulator sim = new Simulator(startTimes, numOfServers);
+        sim.main();
     }
 }

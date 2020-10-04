@@ -1,7 +1,7 @@
 public class Customer {
     
-    private int id;
-    private double arrivalTime;
+    private final int id;
+    private final double arrivalTime;
 
     Customer(int id, double arrivalTime) {
         this.id = id;

@@ -114,10 +114,10 @@ public class Event {
         int lastIndex = getServers().size() - 1;
         Server selectedServer = getServers().get(lastIndex);
 
-        ArrayList<Server> updatedServers = updateSelectedServerInServers(getServers(), selectedServer, false, false, selectedServer.getNextAvailableTime());
+        ArrayList<Server> updatedServers = updateSelectedServerInServers(getServers(), selectedServer, false, false, selectedServer.getNextAvailableTime() + 1.0);
 
         // if customer arrives BEFORE server is ready
-        return returnServeEvent(updatedServers.get(lastIndex).getNextAvailableTime(), getCustomer(), updatedServers);
+        return returnServeEvent(selectedServer.getNextAvailableTime(), getCustomer(), updatedServers);
     }
 
     public Event serveExecute() {
