@@ -1,3 +1,5 @@
+package cs2030;
+
 public class Server {
     
     private final int identifier;

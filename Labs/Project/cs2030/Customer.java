@@ -1,3 +1,5 @@
+package cs2030;
+
 public class Customer {
     
     private final int id;

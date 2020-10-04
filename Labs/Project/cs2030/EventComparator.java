@@ -1,3 +1,5 @@
+package cs2030;
+
 import java.util.Comparator;
 
 public class EventComparator implements Comparator<Event> {

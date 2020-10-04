@@ -1,6 +1,9 @@
+package cs2030;
+
 import java.util.PriorityQueue;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class Simulator {
@@ -10,7 +13,7 @@ public class Simulator {
     private final PriorityQueue<Event> eventQueue;
     private final List<Event> eventSequence;
 
-    Simulator(List<Double> arriveStartTimes, int serverNum) {
+    public Simulator(List<Double> arriveStartTimes, int serverNum) {
         this.servers = createServers(serverNum);
         this.customerQueue = createCustomers(arriveStartTimes);
         this.eventQueue = new PriorityQueue<>(new EventComparator());
@@ -56,7 +59,19 @@ public class Simulator {
         this.eventSequence.add(event);
     }
 
+    public double getWaitTime(Event event) {
+        int lastIndex = event.getServers().size() - 1;
+        double serverAvailableTime = event.getServers().get(lastIndex).getNextAvailableTime();
+        double waitTime = serverAvailableTime - event.getStartTime();
+        return waitTime;
+    }
+
     public void main() {
+
+        int leftCustomers = 0;
+        int servedCustomers = 0;
+        int waitCustomers = 0;
+        double totalWaitTime = 0;
 
         Iterator<Customer> customerQueueIterator = this.customerQueue.iterator();
         Iterator<Event> eventQueueIterator = this.eventQueue.iterator();
@@ -77,6 +92,16 @@ public class Simulator {
             System.out.println("");
 
             if (currentEvent.getState() <= 2) {
+
+                if (currentEvent.getState() == 2) {
+                    servedCustomers++;
+                }
+
+                if (currentEvent.getState() == 1) {
+                    waitCustomers++;
+                    totalWaitTime += getWaitTime(currentEvent);
+                }
+
                 //System.out.println("Event is not DONE/LEAVE, executing...");
                 // if event is executable (is not a DONE/LEAVE event)
                 // run .execute() to get next event
@@ -87,19 +112,6 @@ public class Simulator {
                 System.out.println("");
 
                 if (customerQueueIterator.hasNext()) {
-
-                    // if ((currentEvent.getState() == 0) && (nextEvent.getState() != 4)) {
-
-                    //     // if there are customers waiting,
-                    //     // add ARRIVE event to the queue
-                    //     System.out.println("CREATING NEW ARRIVE STATE\n");
-                    //     Event newArriveEvent = createArriveEvent(nextEvent.getServers());
-                    //     System.out.println(newArriveEvent);
-                    //     System.out.println(newArriveEvent.getServers());
-                    //     System.out.println("");
-                    //     this.eventQueue.add(newArriveEvent);
-                    
-                    // } 
                     
                     if (currentEvent.getState() > 0) {
                         
@@ -119,6 +131,10 @@ public class Simulator {
             } else {
                 // if its a LEAVE or DONE event, check if next customer
                 // arrives before next upcoming event
+
+                if (currentEvent.getState() == 4) {
+                    leftCustomers++;
+                }
                 
                 if (customerQueueIterator.hasNext() && (eventQueueIterator.hasNext())) {
 
@@ -154,5 +170,12 @@ public class Simulator {
             // sequenceStr += event.toString() + System.lineSeparator();
             System.out.println(event);
         }
+
+        double averageWaitTime = totalWaitTime / (double) (servedCustomers);
+
+        String statStr = String.format("[%.3f %d %d]", averageWaitTime, leftCustomers, servedCustomers);
+
+        // System.out.println(Arrays.asList(averageWaitTime, leftCustomers, servedCustomers));
+        System.out.println(statStr);
     }
 }
