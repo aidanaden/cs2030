@@ -85,11 +85,11 @@ public class Simulator {
 
             // log event
             logSequence(currentEvent);
-            System.out.println("========== NEXT ITERATION: ==========");
-            System.out.println("");
-            System.out.println("Current Event: " + currentEvent.toString());
-            System.out.println("Server of current Event: " + currentEvent.getServers().get(currentEvent.getServers().size()-1));
-            System.out.println("");
+            // System.out.println("========== NEXT ITERATION: ==========");
+            // System.out.println("");
+            // System.out.println("Current Event: " + currentEvent.toString());
+            // System.out.println("Server of current Event: " + currentEvent.getServers().get(currentEvent.getServers().size()-1));
+            // System.out.println("");
 
             if (currentEvent.getState() <= 2) {
 
@@ -107,19 +107,19 @@ public class Simulator {
                 // run .execute() to get next event
                 Event nextEvent = currentEvent.execute();
 
-                System.out.println("Next Event: " + nextEvent.toString());
-                System.out.println("Server of next Event: " + nextEvent.getServers().get(nextEvent.getServers().size()-1));
-                System.out.println("");
+                // System.out.println("Next Event: " + nextEvent.toString());
+                // System.out.println("Server of next Event: " + nextEvent.getServers().get(nextEvent.getServers().size()-1));
+                // System.out.println("");
 
                 if (customerQueueIterator.hasNext()) {
                     
                     if (currentEvent.getState() > 0) {
                         
-                        System.out.println("CREATING NEW ARRIVE STATE\n");
+                        // System.out.println("CREATING NEW ARRIVE STATE\n");
                         Event newArriveEvent = createArriveEvent(currentEvent.getServers());
-                        System.out.println(newArriveEvent);
-                        System.out.println(newArriveEvent.getServers());
-                        System.out.println("");
+                        // System.out.println(newArriveEvent);
+                        // System.out.println(newArriveEvent.getServers());
+                        // System.out.println("");
                         this.eventQueue.add(newArriveEvent);
                     }
 
@@ -147,17 +147,17 @@ public class Simulator {
                     double upcomingEventStart = upcomingEvent.getStartTime();
                     
 
-                    System.out.println("NEXT CUSTOMER: " + nextCustomer);
-                    System.out.println("UPCOMING EVENT START: " + upcomingEventStart);
+                    // System.out.println("NEXT CUSTOMER: " + nextCustomer);
+                    // System.out.println("UPCOMING EVENT START: " + upcomingEventStart);
 
                     if (nextCustomer.getArrivalTime() < upcomingEventStart) {
                         // if customer arrives before the next event starts, 
                         // create ARRIVE event for customer
-                        System.out.println("CREATING NEW ARRIVE STATE\n");
+                        // System.out.println("CREATING NEW ARRIVE STATE\n");
                         Event newArriveEvent = createArriveEvent(currentEvent.getServers());
-                        System.out.println(newArriveEvent);
-                        System.out.println(newArriveEvent.getServers());
-                        System.out.println("");
+                        // System.out.println(newArriveEvent);
+                        // System.out.println(newArriveEvent.getServers());
+                        // System.out.println("");
                         this.eventQueue.add(newArriveEvent);
                     
                     } 
