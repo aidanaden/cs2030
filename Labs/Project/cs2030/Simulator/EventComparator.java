@@ -1,4 +1,4 @@
-package cs2030;
+package cs2030.Simulator;
 
 import java.util.Comparator;
 
