@@ -46,7 +46,7 @@ class Schedule {
 
         String returnString = "";
 
-        this.classSchedule.sort(new ClassComparator());
+        this.classSchedule.sort(null);
 
         for (Class currentClass: this.classSchedule) {
 

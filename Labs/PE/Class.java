@@ -1,4 +1,4 @@
-class Class {
+class Class implements Comparable<Class> {
 
     private final String moduleCode;
     private final int classId;
@@ -48,6 +48,40 @@ class Class {
     public String toString() {
 
         return this.venueId;
+    }
+
+    public int compareTo(Class c) {
+
+        if (this.getStartTime() < c.getStartTime()) {
+            return -1;
+
+        } else if (this.getStartTime() == c.getStartTime()) {
+            
+            int c1EndTime = this.getStartTime() + this.getDuration();
+            int c2EndTime = c.getStartTime() + c.getDuration();
+
+            if (c1EndTime < c2EndTime) {
+                return -1;
+
+            } else if (c2EndTime < c1EndTime) {
+                return 1;
+
+            } else {
+
+                int c1Id = this.getClassId();
+                int c2Id = c.getClassId();
+
+                if (c1Id < c2Id) {
+                    return -1;
+                    
+                } else {
+                    return 1;
+                }
+            }
+
+        } else {
+            return 1;
+        }
     }
 
     public boolean hasSameModule(Class anotherClass) {
