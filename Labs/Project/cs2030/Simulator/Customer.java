@@ -1,4 +1,4 @@
-package cs2030.Simulator;
+// package cs2030.Simulator;
 
 public class Customer {
     

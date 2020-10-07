@@ -1,4 +1,4 @@
-package cs2030.Simulator;
+// package cs2030.Simulator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +127,7 @@ public class Event {
         int lastIndex = getServers().size() - 1;
         Server selectedServer = getServers().get(lastIndex);
 
-        ArrayList<Server> updatedServers = updateSelectedServerInServers(getServers(), selectedServer, true, selectedServer.getHasWaitingCustomer(), selectedServer.getNextAvailableTime());
+        ArrayList<Server> updatedServers = updateSelectedServerInServers(getServers(), selectedServer, true, false, selectedServer.getNextAvailableTime());
 
         return returnDoneEvent(getCustomer(), updatedServers);
     }
@@ -137,25 +137,70 @@ public class Event {
         int soonestAvailableServerIndex = 0;
 
         for (Server server : servers) {
+
+            // System.out.println("SERVER TO CHOOSE: " + server);
+            // System.out.print(getCustomer().getArrivalTime() - server.getNextAvailableTime());
                 
             if (servers.indexOf(server) == 0) {
                 continue;
                 
             } else {
 
-                double waitTime = Math.abs(getCustomer().getArrivalTime() - server.getNextAvailableTime());
+                double actualWaitTime = getCustomer().getArrivalTime() - server.getNextAvailableTime();
+                double waitTime = Math.abs(actualWaitTime);
 
                 Server soonestAvailableServer = servers.get(soonestAvailableServerIndex);
-                double soonestAvailableWaitTime = Math.abs(getCustomer().getArrivalTime() - soonestAvailableServer.getNextAvailableTime());
-
+                double actualSoonestAvailableWaitTime = getCustomer().getArrivalTime() - soonestAvailableServer.getNextAvailableTime();
+                double soonestAvailableWaitTime = Math.abs(actualSoonestAvailableWaitTime);
+                
+                int currentServerIndex = servers.indexOf(server);
+                
+                // get absolute diff between customer arrival time
+                // and server next available time 
+                // (pick server that ends sooner)
                 if (waitTime < soonestAvailableWaitTime) {
 
-                    soonestAvailableServerIndex = servers.indexOf(server);
+                    // if customer arrives before server is next available...
+                    if (actualWaitTime < 0) {
+
+                        soonestAvailableServerIndex = currentServerIndex;
+
+                    } else {
+                    // if customer arrives after server is available...
+                    // pick the one that has been available for longer period
+                        if (actualWaitTime > actualSoonestAvailableWaitTime) {
+    
+                            soonestAvailableServerIndex = currentServerIndex;
+                        }
+                    }
                 }
             } 
         }
-    
+
         return soonestAvailableServerIndex;
+    }
+
+    public int getSoonestWaitingServerIndex(List<Server> servers) {
+
+        int lowestServerIdIndex = 0;
+
+        for (Server server : servers) {
+
+            if (servers.indexOf(server) == 0) {
+                continue;
+
+            } else {
+
+                int lowestServerId = servers.get(lowestServerIdIndex).getIdentifier();
+
+                if (server.getIdentifier() < lowestServerId) {
+
+                    lowestServerIdIndex = servers.indexOf(server);
+                }
+            }
+        }
+        
+        return lowestServerIdIndex;
     }
 
     public Event arriveExecute() {
@@ -171,7 +216,7 @@ public class Event {
         }
 
         if (availableServers.size() > 0) {
-
+            
             int soonestServerIndex = getSoonestAvailableServerIndex(availableServers);
 
             Server selectedServer = availableServers.get(soonestServerIndex);
@@ -206,7 +251,7 @@ public class Event {
 
         if (waitingServers.size() > 0) {
 
-            int soonestServerIndex = getSoonestAvailableServerIndex(waitingServers);
+            int soonestServerIndex = getSoonestWaitingServerIndex(waitingServers);
 
             Server selectedServer = waitingServers.get(soonestServerIndex);
 

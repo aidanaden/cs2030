@@ -1,4 +1,4 @@
-package cs2030.Simulator;
+// package cs2030.Simulator;
 
 import java.util.PriorityQueue;
 import java.util.List;
@@ -86,6 +86,28 @@ public class Simulator {
         return new Event(event.getState(), event.getStartTime(), event.getCustomer(), latestServers);
     }
 
+    public List<Server> updateSelectedServerInServers(Server updatedSelectedServer, List<Server> servers) {
+
+        List<Server> updatedServers = new ArrayList<Server>();
+        int selectedServerId = updatedSelectedServer.getIdentifier();
+
+        for (int i = 0; i < servers.size(); i++) {
+
+            Server currentServer = servers.get(i);
+            
+            if (currentServer.getIdentifier() == selectedServerId) {
+
+                updatedServers.add(updatedSelectedServer);
+
+            } else {
+
+                updatedServers.add(currentServer);
+            }
+        }
+
+        return updatedServers;
+    }
+
     public void main() {
 
         int leftCustomers = 0;
@@ -106,7 +128,6 @@ public class Simulator {
 
         // get first ARRIVE event from first CUSTOMER
         // this.eventQueue.add(createArriveEvent(this.servers));
-
         
 
         while (eventQueueIterator.hasNext()) {
@@ -115,11 +136,6 @@ public class Simulator {
 
             // log event
             logSequence(currentEvent);
-            // System.out.println("========== NEXT ITERATION: ==========");
-            // System.out.println("");
-            // System.out.println("Current Event: " + currentEvent.toString());
-            // System.out.println("Server of current Event: " + currentEvent.getServers().get(currentEvent.getServers().size()-1));
-            // System.out.println("");
 
             if (currentEvent.getState() != 4) {
 
@@ -132,48 +148,32 @@ public class Simulator {
                     totalWaitTime += getWaitTime(currentEvent);
                 }
 
+                
+
                 Event nextEvent;
 
                 if (currentEvent.getState() == 0) {
 
+
+                    int lastIndex = latestServers.size() - 1;
+
                     Event updatedArriveEvent = updateEventWithLatestServers(currentEvent, latestServers);
                     nextEvent = updatedArriveEvent.execute();
-                    latestServers = nextEvent.getServers();
+                    this.eventQueue.add(nextEvent);
 
                 } else {
 
-                    nextEvent = currentEvent.execute();
-                    latestServers = nextEvent.getServers();
+                    int lastIndex = currentEvent.getServers().size() - 1;
+                    Server selectedServer = currentEvent.getServers().get(lastIndex);
+
+                    latestServers = updateSelectedServerInServers(selectedServer, latestServers);
                     
+                    if (currentEvent.getState() < 3) {
+                        nextEvent = currentEvent.execute();
+                        this.eventQueue.add(nextEvent);
+                    }
                 }
-
-                this.eventQueue.add(nextEvent);
-
-                //System.out.println("Event is not DONE/LEAVE, executing...");
-                // if event is executable (is not a DONE/LEAVE event)
-                // run .execute() to get next event
-                // Event nextEvent = currentEvent.execute();
-
-                // System.out.println("Next Event: " + nextEvent.toString());
-                // System.out.println("Server of next Event: " + nextEvent.getServers().get(nextEvent.getServers().size()-1));
-                // System.out.println("");
-
-                // if (customerQueueIterator.hasNext()) {
-                    
-                //     if (currentEvent.getState() > 0) {
-                        
-                //         // System.out.println("CREATING NEW ARRIVE STATE\n");
-                //         Event newArriveEvent = createArriveEvent(currentEvent.getServers());
-                //         // System.out.println(newArriveEvent);
-                //         // System.out.println(newArriveEvent.getServers());
-                //         // System.out.println("");
-                //         this.eventQueue.add(newArriveEvent);
-                //     }
-
-                // }
-
-                // add newly created event to the queue 
-                // this.eventQueue.add(nextEvent);
+            
             
             } else {
                 // if its a LEAVE or DONE event, check if next customer
@@ -181,36 +181,6 @@ public class Simulator {
 
                 
                 leftCustomers++;
-                
-
-                
-                
-                // if (customerQueueIterator.hasNext() && (eventQueueIterator.hasNext())) {
-
-                //     // get next event and customer
-                //     Customer nextCustomer = customerQueue.poll();
-                //     Event upcomingEvent = this.eventQueue.poll();
-                //     this.eventQueue.add(upcomingEvent);
-                //     customerQueue.add(nextCustomer);
-
-                //     double upcomingEventStart = upcomingEvent.getStartTime();
-                    
-
-                    // System.out.println("NEXT CUSTOMER: " + nextCustomer);
-                    // System.out.println("UPCOMING EVENT START: " + upcomingEventStart);
-
-                //     if (nextCustomer.getArrivalTime() < upcomingEventStart) {
-                //         // if customer arrives before the next event starts, 
-                //         // create ARRIVE event for customer
-                //         // System.out.println("CREATING NEW ARRIVE STATE\n");
-                //         Event newArriveEvent = createArriveEvent(currentEvent.getServers());
-                //         // System.out.println(newArriveEvent);
-                //         // System.out.println(newArriveEvent.getServers());
-                //         // System.out.println("");
-                //         this.eventQueue.add(newArriveEvent);
-                    
-                //     } 
-                // }
             }
 
         }
