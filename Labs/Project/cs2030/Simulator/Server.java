@@ -7,7 +7,9 @@ public class Server {
     private final boolean hasWaitingCustomer;
     private final double nextAvailableTime;
 
-    Server(int identifier, boolean isAvailable, boolean hasWaitingCustomer, double nextAvailableTime) {
+    Server(int identifier, boolean isAvailable, 
+            boolean hasWaitingCustomer, double nextAvailableTime) {
+
         this.identifier = identifier;
         this.isAvailable = isAvailable;
         this.hasWaitingCustomer = hasWaitingCustomer;
@@ -44,9 +46,11 @@ public class Server {
             returnStr += "busy";
 
             if (hasWaitingCustomer) {
-                returnStr += String.format("; waiting customer to be served at %.3f", this.nextAvailableTime); 
+                returnStr += String.format("; waiting customer to be served at %.3f", 
+                                            this.nextAvailableTime); 
             } else {
-                returnStr += String.format("; available at %.3f", this.nextAvailableTime);
+                returnStr += String.format("; available at %.3f", 
+                                            this.nextAvailableTime);
             }
         }
         return returnStr;
