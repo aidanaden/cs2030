@@ -26,47 +26,4 @@ public class Student extends KeyableMap<Module> {
             
         return this;
     }
-
-    @Override
-    public Module get(String moduleName) {
-
-        Map<String, ArrayList<Module>> map = super.getMap();
-
-        ArrayList<Module> modules = map.get(super.getKey());
-
-        for (Module mod : modules) {
-
-            if (mod.getKey() == moduleName) {
-                return mod;
-            }
-        }
-       
-        return null;
-    }
-
-    @Override
-    public String toString() {
-
-        String formatStr = String.format("%s: {", super.getKey());
-
-        ArrayList<Module> objects = super.getMap().get(super.getKey());
-
-        for (int i = 0; i < objects.size(); i++) {
-
-            Module ass = objects.get(i);
-
-            if (i == 0) {
-
-                formatStr += ass.toString();
-
-            } else {
-
-                formatStr += ", " + ass.toString();
-            }
-        }
-
-        formatStr += "}";
-
-        return formatStr;
-    }
 }

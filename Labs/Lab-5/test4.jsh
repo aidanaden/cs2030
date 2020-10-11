@@ -1,3 +1,8 @@
+/open Keyable.java
+/open Assessment.java
+/open KeyableMap.java
+/open Module.java
+/open Student.java
 new Module("CS2040").put(new Assessment("Lab1", "B")).get("Lab1")
 new Student("Tony").put(new Module("CS2040").put(new Assessment("Lab1", "B")))
 new Student("Tony").put(new Module("CS2040").put(new Assessment("Lab1", "B"))).get("CS2040")
@@ -7,4 +12,4 @@ natasha.put(new Module("CS2030").put(new Assessment("PE", "A+")).put(new Assessm
 Student tony = new Student("Tony");
 tony.put(new Module("CS1231").put(new Assessment("Test", "A-")))
 tony.put(new Module("CS2100").put(new Assessment("Test", "B")).put(new Assessment("Lab1", "F")))
-/exit
+

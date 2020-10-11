@@ -1,11 +1,11 @@
 import java.security.Key;
 import java.util.Map;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Optional;
 
-public abstract class KeyableMap<V> implements Keyable {
+public abstract class KeyableMap<V extends Keyable> implements Keyable {
 
-    private Map<String, ArrayList<V>> map;
+    private final Map<String, ArrayList<V>> map;
     private final String key;
 
     KeyableMap(String key, Map<String, ArrayList<V>> map) {
@@ -21,7 +21,28 @@ public abstract class KeyableMap<V> implements Keyable {
         return this.key;
     }
 
-    public abstract V get(String key);
+    public Optional<V> get(String key) {
+
+        Map<String, ArrayList<V>> map = getMap();
+
+        ArrayList<V> objects = map.get(getKey());
+
+        for (V obj : objects) {
+
+            if (obj instanceof Keyable) {
+
+                Keyable keyableObj = (Keyable) obj;
+                
+                if (keyableObj.getKey() == key) {
+
+                    return Optional.of(obj);
+                }
+            }   
+        }
+
+        return Optional.empty();
+    }
+
     public abstract KeyableMap<V> put(V item);
 
     @Override

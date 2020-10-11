@@ -26,21 +26,4 @@ public class Module extends KeyableMap<Assessment> {
             
         return this;
     }
-
-    @Override
-    public Assessment get(String assessmentName) {
-
-        Map<String, ArrayList<Assessment>> map = super.getMap();
-
-        ArrayList<Assessment> assessments = map.get(getKey());
-
-        for (Assessment ass : assessments) {
-
-            if (ass.getKey() == assessmentName) {
-                return ass;
-            }
-        }
-       
-        return null;
-    }    
 }

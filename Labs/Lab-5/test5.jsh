@@ -1,3 +1,9 @@
+/open Keyable.java
+/open Assessment.java
+/open KeyableMap.java
+/open Module.java
+/open Student.java
+/open Roster.java
 Student natasha = new Student("Natasha");
 natasha.put(new Module("CS2040").put(new Assessment("Lab1", "B")))
 natasha.put(new Module("CS2030").put(new Assessment("PE", "A+")).put(new Assessment("Lab2", "C")))
