@@ -33,7 +33,7 @@ public abstract class KeyableMap<V extends Keyable> implements Keyable {
 
                 Keyable keyableObj = (Keyable) obj;
                 
-                if (keyableObj.getKey() == key) {
+                if (keyableObj.getKey().equals(key)) {
 
                     return Optional.of(obj);
                 }

@@ -21,6 +21,11 @@ public class Assessment implements Keyable {
         return this.key;
     }
 
+    public Assessment put(String newGrade) {
+        this.assessmentHashMap.put(getKey(), newGrade);
+        return this;
+    }
+
     @Override
     public String toString() {
         return String.format("{%s: %s}", getKey(), getGrade());

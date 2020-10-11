@@ -1,6 +1,7 @@
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Student extends KeyableMap<Module> {
     
@@ -21,6 +22,8 @@ public class Student extends KeyableMap<Module> {
         ArrayList<Module> existingModules = map.get(super.getKey());
 
         existingModules.add(newModule);        
+
+        Collections.sort(existingModules, new ModuleComparator());
 
         map.put(super.getKey(), existingModules);
             
