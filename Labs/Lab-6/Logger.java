@@ -1,8 +1,9 @@
+import java.util.ArrayList;
 import java.util.function.Function;
 
 interface Logger<T> {
 
-    static <T> LoggerImpl<T> make(T thing){
+    static <T> Logger<T> make(T thing){
 
         if (thing instanceof Logger) {
 
@@ -14,7 +15,9 @@ interface Logger<T> {
 
         } else {
 
-            return new LoggerImpl<>(thing);
+            ArrayList<Object> lastObjs = new ArrayList<Object>();
+            lastObjs.add(thing);
+            return new LoggerImpl<>(thing, lastObjs);
         }
     }
 

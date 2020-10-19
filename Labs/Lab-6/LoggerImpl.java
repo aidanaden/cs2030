@@ -12,7 +12,6 @@ public class LoggerImpl<T> implements Logger<T> {
     
         this.obj = obj;
         this.lastObjs = new ArrayList<>();
-        this.lastObjs.add(this.obj);
         this.log = createLog();
     }
 
@@ -20,7 +19,6 @@ public class LoggerImpl<T> implements Logger<T> {
 
         this.obj = obj;
         this.lastObjs = objs;
-        this.lastObjs.add(obj);
         this.log = createLog();
     }
 
@@ -70,7 +68,7 @@ public class LoggerImpl<T> implements Logger<T> {
 
                 if (obj.equals(prevObj)) {
 
-                    log += "\nValue unchanged! Value = " + obj;
+                    log += "\nValue unchanged. Value = " + obj;
     
                 } else {
     
@@ -107,6 +105,7 @@ public class LoggerImpl<T> implements Logger<T> {
     public <U> LoggerImpl<U> map(Function<? super T, ? extends U> mapper) {
         
         U result = mapper.apply(getObj());
+        this.lastObjs.add(result);
 
         return new LoggerImpl<U>(result, this.lastObjs);
     }
@@ -127,19 +126,30 @@ public class LoggerImpl<T> implements Logger<T> {
             
             // combinedObjs.add(loggerResult.getObj());
             combinedObjs.addAll(this.lastObjs);
+
+            // remove copy of this.lastObjs.
+            loggerResult.getLastObjs().remove(0);
+
+            combinedObjs.addAll(loggerResult.getLastObjs());
+
+            // combinedObjs.remove(combinedObjs.size() - 1);
+
             // loggerResult.getLastObjs().remove(loggerResult.getObj());
             // combinedObjs.addAll(loggerResult.getLastObjs());
-            System.out.println("Log of Result Logger: ");
-            System.out.print(loggerResult.getLastObjs());
-            System.out.println("\nEnd of Log");
 
-            if (combinedObjs.get(combinedObjs.size() - 1) == loggerResult.getObj()) {
-                combinedObjs.remove(combinedObjs.size() - 1);
-            }
+            // System.out.println("Log of Result Logger: ");
+            // System.out.print(loggerResult.getLastObjs());
 
-            System.out.println("\nCombined log added to new Logger");
-            System.out.println(combinedObjs);
-            System.out.println("End of combined Log");
+            // if (combinedObjs.size() > 0) {
+
+            //     if (combinedObjs.get(0) == loggerResult.getObj()) {
+            //         combinedObjs.remove(0);
+            //     }
+            // }
+            
+
+            // System.out.println("\nCombined log added to new Logger");
+            // System.out.println(combinedObjs);
             
 
             LoggerImpl<U> newLoggerResult = new LoggerImpl<U>(loggerResult.getObj(), combinedObjs);
