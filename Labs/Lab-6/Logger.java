@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 interface Logger<T> {
 
@@ -23,7 +24,7 @@ interface Logger<T> {
 
     void printlog();
     
-    // boolean test(Predicate<? super T> pred);
+    boolean test(Predicate<? super T> pred);
     
     <U> LoggerImpl<U> map(Function<? super T, ? extends U> mapper);
     

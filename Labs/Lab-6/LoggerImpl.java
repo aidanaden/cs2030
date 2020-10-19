@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class LoggerImpl<T> implements Logger<T> {
 
@@ -118,39 +119,14 @@ public class LoggerImpl<T> implements Logger<T> {
 
             LoggerImpl<? extends U> loggerResult = (LoggerImpl<? extends U>) result;
 
-            // System.out.println("Result log ");
-            // System.out.println(loggerResult.getLog());
-            // System.out.print("Result log END");
-
             ArrayList<Object> combinedObjs = new ArrayList<>();
-            
-            // combinedObjs.add(loggerResult.getObj());
+    
             combinedObjs.addAll(this.lastObjs);
 
             // remove copy of this.lastObjs.
             loggerResult.getLastObjs().remove(0);
 
             combinedObjs.addAll(loggerResult.getLastObjs());
-
-            // combinedObjs.remove(combinedObjs.size() - 1);
-
-            // loggerResult.getLastObjs().remove(loggerResult.getObj());
-            // combinedObjs.addAll(loggerResult.getLastObjs());
-
-            // System.out.println("Log of Result Logger: ");
-            // System.out.print(loggerResult.getLastObjs());
-
-            // if (combinedObjs.size() > 0) {
-
-            //     if (combinedObjs.get(0) == loggerResult.getObj()) {
-            //         combinedObjs.remove(0);
-            //     }
-            // }
-            
-
-            // System.out.println("\nCombined log added to new Logger");
-            // System.out.println(combinedObjs);
-            
 
             LoggerImpl<U> newLoggerResult = new LoggerImpl<U>(loggerResult.getObj(), combinedObjs);
 
@@ -159,6 +135,9 @@ public class LoggerImpl<T> implements Logger<T> {
 
         return null;
     }
+
+    public boolean test(Predicate<? super T> pred) {
+
+        return pred.test(this.getObj());
+    }
 }
-
-
