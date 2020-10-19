@@ -15,4 +15,3 @@ Function<Object, Logger<Boolean>> f = x -> Logger.make(x).map(y -> y.equals(y))
 Logger.make("hello").flatMap(f)
 Function<String, Logger<Number>> g = x -> Logger.make(x).map(y -> y.length())
 Logger<Number> lognum = Logger.make("hello").flatMap(g)
-lognum

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.function.Function;
 
 public class LoggerImpl<T> implements Logger<T> {
@@ -11,7 +12,7 @@ public class LoggerImpl<T> implements Logger<T> {
     
         this.obj = obj;
         this.lastObjs = new ArrayList<>();
-        lastObjs.add(this.obj);
+        this.lastObjs.add(this.obj);
         this.log = createLog();
     }
 
@@ -22,6 +23,14 @@ public class LoggerImpl<T> implements Logger<T> {
         this.lastObjs.add(obj);
         this.log = createLog();
     }
+
+    // LoggerImpl(T obj, String log) {
+        
+    //     this.obj = obj;
+    //     this.lastObjs = new ArrayList<>();
+    //     this.lastObjs.add(this.obj);
+    //     this.log = log;
+    // }
 
     public T getObj() {
         return this.obj;
@@ -99,18 +108,41 @@ public class LoggerImpl<T> implements Logger<T> {
         
         U result = mapper.apply(getObj());
 
-        return new LoggerImpl<U>(result, lastObjs);
+        return new LoggerImpl<U>(result, this.lastObjs);
     }
 
     public <U> LoggerImpl<U> flatMap(Function<? super T, ? extends Logger<? extends U>> mapper) {
 
         Logger<? extends U> result = mapper.apply(this.obj);
 
-        if (result instanceof LoggerImpl) {
+        if (result instanceof LoggerImpl<?>) {
 
             LoggerImpl<? extends U> loggerResult = (LoggerImpl<? extends U>) result;
 
-            LoggerImpl<U> newLoggerResult = new LoggerImpl<U>(loggerResult.getObj());
+            // System.out.println("Result log ");
+            // System.out.println(loggerResult.getLog());
+            // System.out.print("Result log END");
+
+            ArrayList<Object> combinedObjs = new ArrayList<>();
+            
+            // combinedObjs.add(loggerResult.getObj());
+            combinedObjs.addAll(this.lastObjs);
+            // loggerResult.getLastObjs().remove(loggerResult.getObj());
+            // combinedObjs.addAll(loggerResult.getLastObjs());
+            System.out.println("Log of Result Logger: ");
+            System.out.print(loggerResult.getLastObjs());
+            System.out.println("\nEnd of Log");
+
+            if (combinedObjs.get(combinedObjs.size() - 1) == loggerResult.getObj()) {
+                combinedObjs.remove(combinedObjs.size() - 1);
+            }
+
+            System.out.println("\nCombined log added to new Logger");
+            System.out.println(combinedObjs);
+            System.out.println("End of combined Log");
+            
+
+            LoggerImpl<U> newLoggerResult = new LoggerImpl<U>(loggerResult.getObj(), combinedObjs);
 
             return newLoggerResult;
         }
@@ -118,3 +150,5 @@ public class LoggerImpl<T> implements Logger<T> {
         return null;
     }
 }
+
+
