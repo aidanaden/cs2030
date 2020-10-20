@@ -125,18 +125,8 @@ public class LoggerImpl<T> implements Logger<T> {
 
             // remove copy of this.lastObjs.
             loggerResult.getLastObjs().remove(0);
-
-            System.out.print(combinedObjs);
-            System.out.println(loggerResult.getLastObjs());
-            System.out.print(loggerResult.getObj());
-            System.out.print("\n");
             
             combinedObjs.addAll(loggerResult.getLastObjs());
-
-
-            // combinedObjs.remove(0);
-
-            // System.out.println(combinedObjs);
 
             LoggerImpl<U> newLoggerResult = new LoggerImpl<U>(loggerResult.getObj(), combinedObjs);
 

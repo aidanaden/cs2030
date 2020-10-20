@@ -23,11 +23,14 @@ Logger<Integer> f(int n) {
            
     } else if (n % 2 == 0) {
 
-        return logger.flatMap(x -> f(n / 2).map(y -> n / 2));
+        logger = logger.map(y -> n / 2);
+        return logger.flatMap(x -> f(n / 2));
         
     } else {
         
-        return logger.flatMap(x -> f(3 * n + 1).map(y -> 3 * n + 1));
+        logger = logger.map(y -> 3 * n);
+        logger = logger.map(z -> z + 1);
+        return logger.flatMap(x -> f(3 * n + 1));
     } 
 }
 
