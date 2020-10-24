@@ -1,0 +1,389 @@
+<h3>Lazy Values</h3>
+
+<h4>Topic Coverage</h4>
+
+<ul>
+<li>Lazy Evaluation
+<li>Memoization
+<li>Generics and Bounded Wildcards
+</ul>
+
+<h4>Problem Description</h4>
+
+<p>Programming languages such as Scala supports lazy values, where the expression that produces a lazy value is not evaluated until the value is needed.  Lazy value is useful for cases where producing the value is expensive, but the value might not eventually be used.  
+Java, however, does not provide a similar abstraction.  
+So, you are going to build one.
+</p>
+
+<h4>Task</h4>
+
+<p>Your task is to write an <i>immutable</i> <tt>Lazy</tt> class to support the operations involving lazy values.
+Remember that a lazy value is <b>not</b> evaluated during creation, but only until the value is needed.
+Moreover, the first time this value is computed, a cached copy is stored.
+This allows subsequent accesses to this same value to be retrieved directly, rather than computing it all over again.
+
+<p>Caching would inevitably require a change in state of the cache <i>after</i> the lazy value is created.
+Although we can no longer define the cache as <tt>private final</tt> and hence seem to violate <i>immutability</i>, it has to be noted that from the client's perspective of using lazy values, it is unaware of caching.
+The client only requires that lazy values always give the same value (whether they are computed the first time, or retrieved from the cache).
+So from the <i>observer's</i> point of view, lazy values still obey the <i>immutable</i> property.
+
+<p>This task is divided into several levels.
+You are highly encouraged to read through all the levels to see how the different levels are related.
+<ul>
+<li>You are required to design a single <tt>Lazy</tt> class for levels 1 to 6.
+Level 6 requires an additional class <tt>LazyList</tt>.
+</ul>
+
+<p>Take note of the following constraints:
+
+<ul>
+<li>You are not allowed to use <tt>null</tt> 
+<li>You are not allowed to use the <tt>isPresent()</tt>, <tt>isEmpty()</tt> or <tt>get()</tt> methods of the <tt>Optional</tt> class
+<li>You are not allowed to use the Java looping constructs: <tt>for</tt>, <tt>while</tt> and <tt>do</tt>
+</ul>
+
+<p>Just remember to:
+
+<ul>
+<li>always compile your program files first before using <tt>jshell</tt> to test your program, or running your program with <tt>java</tt>
+<li><tt>checkstyle</tt> and <tt>javadoc</tt> comments to enhance code readability and facilitating code review
+</ul>
+
+<p>
+<h4>Level 1</h4>
+
+<p>Define a generic <tt>Lazy</tt> class to encapsulate a value with the following operations:
+<ul>
+	<li>static <tt>of(T v)</tt> method that initializes the <tt>Lazy</tt> object with the given value.</li>
+	<li>static <tt>of(Supplier s)</tt> method that takes in a supplier that supplies the value when needed.</li>
+	<li><tt>get()</tt> method that is called when the value is needed.  If the value is already available, return that value; otherwise, compute the value and return it.  The computation should only be done once for the same value.</li>
+    <li><tt>toString()</tt>: returns <tt>"?"</tt> if the value is not yet available; returns the string representation of the value otherwise.</li>
+</ul>
+
+<pre>
+<b>jshell&gt; Lazy&lt;Integer&gt; eight = Lazy.of(8)</b>
+<b>jshell&gt; eight</b>
+eight ==&gt; ?
+<b>jshell&gt; eight.get()</b>
+$.. ==&gt; 8
+<b>jshell&gt; eight</b>
+eight ==&gt; 8
+<b>jshell&gt; Supplier&lt;String&gt; s = () -&gt; "hello"</b>
+<b>jshell&gt; Lazy&lt;String&gt; hello = Lazy.of(s)</b>
+<b>jshell&gt; hello</b>
+hello ==&gt; ?
+<b>jshell&gt; hello.get()</b>
+$.. ==&gt; "hello"
+<b>jshell&gt; s = () -&gt; { System.out.println("world!"); return "hello"; }</b>
+<b>jshell&gt; Lazy&lt;String&gt; hello = Lazy.of(s)</b>
+<b>jshell&gt; hello</b>
+hello ==&gt; ?
+<b>jshell&gt; hello.get()</b>
+world!
+$.. ==&gt; "hello"
+<b>jshell&gt; // check that "world!" should not be printed again.</b>
+<b>jshell&gt; hello.get()</b>
+$.. ==&gt; "hello"
+<b>jshell&gt; Random rng = new Random(1)</b>
+<b>jshell&gt; Supplier&lt;Integer&gt; r = () -&gt; rng.nextInt()</b>
+<b>jshell&gt; Lazy&lt;Integer&gt; random = Lazy.of(r)</b>
+<b>jshell&gt; // check that random value should not be available</b>
+<b>jshell&gt; random</b>
+random ==&gt; ?
+<b>jshell&gt; // check that random value is obtained only once</b>
+<b>jshell&gt; random.get().equals(random.get())</b>
+$.. ==&gt; true
+<b>jshell&gt; // exception thrown when passing a null to of()</b>
+<b>jshell&gt; Supplier&lt;Integer&gt; si = null</b>
+<b>jshell&gt; try { Lazy.of(si); } catch(Exception e) { System.out.println(e); }</b>
+java.util.NoSuchElementException: No value present
+<b>jshell&gt; // passing a supplier of null to of()</b>
+<b>jshell&gt; si = () -&gt; null</b>
+<b>jshell&gt; Lazy&lt;Integer&gt; lazy = Lazy.of(si)</b>
+<b>jshell&gt; // exception thrown when get() is called</b>
+<b>jshell&gt; try { lazy.get(); } catch(Exception e) { System.out.println(e); }</b>
+java.lang.NullPointerException
+<b>jshell&gt; /exit</b>
+</pre>
+
+<p>
+Check the format correctness of the output by running the following on the command line:
+<pre>
+$ javac -Xlint:rawtypes *.java
+$ jshell -q your_java_files_in_bottom-up_dependency_order &lt; test1.jsh
+</pre>
+<p>
+Check your styling by issuing the following
+</p>
+<pre>
+$ checkstyle *.java
+</pre>
+
+<h4>Level 2</h4>
+
+<p>Now let's make <tt>Lazy</tt> a functor and a monad by adding the <tt>map</tt> and <tt>flatMap</tt> method.  
+Remember that <tt>Lazy</tt> should not evaluate anything until <tt>get()</tt> is called, so the function <tt>f</tt> passed into <tt>Lazy</tt> through <tt>map</tt> and <tt>flatMap</tt> should not be evaluated until <tt>get()</tt> is called.  
+Furthermore, they should be evaluated once.  That result from <tt>map</tt> and <tt>flatMap</tt>, once evaluated, should be cached (also called <i>memoized</i>), so that function must not be called again.
+
+<pre>
+<b>jshell&gt; Supplier&lt;String&gt; s = () -&gt; "123456" </b>
+<b>jshell&gt; Lazy&lt;String&gt; lazy = Lazy.of(s)</b>
+<b>jshell&gt; lazy.map(str -&gt; str.substring(0, 1))</b>
+$.. ==&gt; ?
+<b>jshell&gt; lazy.get()</b>
+$.. ==&gt; "123456"
+<b>jshell&gt; lazy = lazy.map(str -&gt; str.substring(0, 3))</b>
+<b>jshell&gt; lazy.get()</b>
+$.. ==&gt; "123"
+<b>jshell&gt; Function&lt;String,String&gt; substr = str -&gt; {</b>
+<b>   ...&gt; System.out.println("substring");</b>
+<b>   ...&gt; return str.substring(0, 1);</b>
+<b>   ...&gt; }</b>
+<b>jshell&gt; lazy = lazy.map(substr)</b>
+<b>jshell&gt; lazy.get()</b>
+substring
+$.. ==&gt; "1"
+<b>jshell&gt; lazy.get()</b>
+$.. ==&gt; "1"
+<b>jshell&gt; Lazy&lt;Integer&gt; lazy = Lazy.of(10)</b>
+<b>jshell&gt; lazy = lazy.map(i -&gt; i + 1)</b>
+<b>jshell&gt; lazy = lazy.flatMap(j -&gt; Lazy.of(j + 3))</b>
+<b>jshell&gt; lazy</b>
+lazy ==&gt; ?
+<b>jshell&gt; lazy.get()</b>
+$.. ==&gt; 14
+<b>jshell&gt; lazy</b>
+lazy ==&gt; 14
+<b>jshell&gt; /exit</b>
+</pre>
+
+<p>
+Check the format correctness of the output by running the following on the command line:
+<pre>
+$ javac -Xlint:rawtypes *.java
+$ jshell -q your_java_files_in_bottom-up_dependency_order &lt; test2.jsh
+</pre>
+<p>
+Check your styling by issuing the following
+</p>
+<pre>
+$ checkstyle *.java
+</pre>
+
+<h4>Level 3</h4>
+
+<p>Make <tt>Lazy</tt> more useful by adding the method <tt>combine</tt>, which takes in another <tt>Lazy</tt> object and a <tt>BiFunction</tt> to lazily combine the two <tt>Lazy</tt> objects (which may contain values of different types) and return a new <tt>Lazy</tt> object.
+
+<pre>
+<b>jshell&gt; /open Lazy.java</b>
+<b>jshell&gt; Lazy&lt;Integer&gt; five, ten, fifty, hundred</b>
+<b>jshell&gt; ten = Lazy.of(10)</b>
+<b>jshell&gt; five = Lazy.of(5)</b>
+<b>jshell&gt; // combine (same types)</b>
+<b>jshell&gt; BiFunction&lt;Integer,Integer,Integer&gt; add = (x, y) -&gt; {</b>
+<b>   ...&gt; System.out.println("combine");</b>
+<b>   ...&gt; return x + y;</b>
+<b>   ...&gt; }</b>
+<b>jshell&gt; fifty = five.combine(ten, (x, y) -&gt; x * y)</b>
+<b>jshell&gt; fifty</b>
+fifty ==&gt; ?
+<b>jshell&gt; hundred = fifty.combine(fifty, add)</b>
+<b>jshell&gt; hundred</b>
+hundred ==&gt; ?
+<b>jshell&gt; // combine (different types)</b>
+<b>jshell&gt; BiFunction&lt;Integer,Double,String&gt; f = (x, y) -&gt; Integer.toString(x) + " " + Double.toString(y)</b>
+<b>jshell&gt; Lazy&lt;String&gt; s = Lazy.of(10).combine(Lazy.of(0.01), f)</b>
+<b>jshell&gt; s</b>
+s ==&gt; ?
+<b>jshell&gt; s.get()</b>
+$.. ==&gt; "10 0.01"
+<b>jshell&gt; /exit</b>
+</pre>
+
+<p>
+Check the format correctness of the output by running the following on the command line:
+<pre>
+$ javac -Xlint:rawtypes *.java
+$ jshell -q your_java_files_in_bottom-up_dependency_order &lt; test3.jsh
+</pre>
+<p>
+Check your styling by issuing the following
+</p>
+<pre>
+$ checkstyle *.java
+</pre>
+
+<h4>Level 4</h4>
+
+<p>Write a <tt>test</tt> method, which takes in a <tt>Predicate</tt> and lazily tests if the value passes the predicate or not.  Returns a <tt>Lazy&lt;Boolean&gt;</tt> object.</li>
+
+Then write an <tt>equals</tt>, which overrides the <tt>equals</tt> method in the <tt>Object</tt> class.  <tt>equals</tt> is an eager operation that causes the values to be evaluated (if not already cached).  <tt>equals</tt> should return true only both objects being compared are <tt>Lazy</tt> and the value contains within are equals (according to their <tt>equals()</tt> methods).
+
+<pre>
+<b>jshell&gt; Lazy&lt;Integer&gt; fifty = Lazy.of(50)</b>
+<b>jshell&gt; Lazy&lt;Boolean&gt; even = fifty.test(i -&gt; i % 2 == 0)</b>
+<b>jshell&gt; even</b>
+even ==&gt; ?
+<b>jshell&gt; even.get()</b>
+$.. ==&gt; true
+<b>jshell&gt; even</b>
+even ==&gt; true
+<b>jshell&gt; // equals</b>
+<b>jshell&gt; fifty.equals(Lazy.of(5).map(i -&gt; i * 10))</b>
+$.. ==&gt; true
+<b>jshell&gt; fifty.equals(50)</b>
+$.. ==&gt; false
+<b>jshell&gt; even.equals(Lazy.of(true))</b>
+$.. ==&gt; true
+<b>jshell&gt; /exit</b>
+</pre>
+
+<p>
+Check the format correctness of the output by running the following on the command line:
+<pre>
+$ javac -Xlint:rawtypes *.java
+$ jshell -q your_java_files_in_bottom-up_dependency_order &lt; test4.jsh
+</pre>
+<p>
+Check your styling by issuing the following
+</p>
+<pre>
+$ checkstyle *.java
+</pre>
+
+<h4>Level 5</h4>
+
+<p>Now, change <tt>Lazy</tt> so that it only store subtypes of <tt>Comparable</tt>, so that we can use the <tt>compareTo</tt> method to compare to <tt>Lazy</tt> values.  
+The comparison is done lazily, i.e., only when needed.  
+
+<p>Write a <tt>compareTo</tt> method for <tt>Lazy</tt> that returns a <tt>Lazy&lt;Integer&gt;</tt> to compare the value contained within <tt>Lazy</tt>.  
+The semantic for <tt>Lazy</tt>'s <tt>compareTo</tt> is the same as the <tt>Comparable</tt>'s <tt>compareTo</tt>.
+
+<p><i>Note that only the value stored in <tt>Lazy</tt> needs to be a subtype of <tt>Comparable</tt>.  <tt>Lazy</tt> itself need not be a subtype of <tt>Comparable</tt></i>.</p>
+
+<pre>
+<b>jshell&gt; Lazy&lt;Integer&gt; one, two, three</b>
+<b>jshell&gt; one = Lazy.of(1) </b>
+<b>jshell&gt; two = Lazy.of(2)</b>
+<b>jshell&gt; three = Lazy.of(3)</b>
+<b>jshell&gt; two.compareTo(one)</b>
+$.. ==&gt; ?
+<b>jshell&gt; one.compareTo(three)</b>
+$.. ==&gt; ?
+<b>jshell&gt; three.compareTo(three)</b>
+$.. ==&gt; ?
+<b>jshell&gt; two.compareTo(one).test(c -&gt; c &gt; 0).get()</b>
+$.. ==&gt; true
+<b>jshell&gt; one.compareTo(three).test(c -&gt; c &lt; 0).get()</b>
+$.. ==&gt; true
+<b>jshell&gt; three.compareTo(three).test(c -&gt; c == 0).get()</b>
+$.. ==&gt; true
+<b>jshell&gt; /exit</b>
+</pre>
+
+<p>
+Check the format correctness of the output by running the following on the command line:
+<pre>
+$ javac -Xlint:rawtypes *.java
+$ jshell -q your_java_files_in_bottom-up_dependency_order &lt; test5.jsh
+</pre>
+<p>
+Check your styling by issuing the following
+</p>
+<pre>
+$ checkstyle *.java
+</pre>
+
+<h4>Level 6</h4>
+
+<p>The <tt>Lazy</tt> class can be used to build a lazily-evaluated finite list, which is simpler, but not as elegant, as efficient, nor as useful, as an infinite list.
+
+<p>Consider the class <tt>EagerList</tt> below which makes use of Java streams.  
+Given <tt>n</tt>, the size of the list, <tt>seed</tt>, the initial value, and <tt>f</tt>, an operation, we can generate an <tt>EagerList</tt> as
+<tt>[seed, f(seed), f(f(seed)), f(f(f(seed))), ... ]</tt>, 
+up to <tt>n</tt> elements.
+
+<p>We can then use the method <tt>get(i)</tt> to find the i-th element in this list, or <tt>indexOf(obj)</tt> to find the obj in the list.
+
+<pre>
+import java.util.List;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
+
+class EagerList&lt;T&gt; {
+    List&lt;T&gt; list;
+    private EagerList(List&lt;T&gt; list) {
+        this.list = list;
+    }
+
+    static &lt;T&gt; EagerList&lt;T&gt; generate(int n, T seed, UnaryOperator&lt;T&gt; f) {
+        return new EagerList&lt;T&gt;(
+                Stream.iterate(seed, x -&gt; f.apply(x))
+                .limit(n)
+                .collect(Collectors.toList())
+                );
+    }
+
+    public T get(int i) {
+        return this.list.get(i);
+    }
+
+    public int indexOf(T v) {
+        return this.list.indexOf(v);
+    }
+}
+</pre>
+
+<p>But suppose f() is an expensive computation, and we ended up with just needing to just <tt>get(k)</tt> where <tt>k</tt> is much smaller than <tt>N</tt>, then, we would have wasted our time computing all the remaining elements in the list!  Similarly, if the <tt>obj</tt> that we want to find using <tt>indexOf</tt> is near the beginning of the list, there is no need to compute the remaining elements of the list.
+
+<p>Rewrite the <tt>EagerList</tt> class as a new class called <tt>LazyList</tt>, making use of the <tt>Lazy</tt> class you have constructed in the previous levels, so that <tt>get()</tt> and <tt>indexOf()</tt> causes evaluation of <tt>f()</tt> only as many times as necessary.
+You may assume that list access is guaranteed to be within bounds.
+
+<p>Note: Do not use the <tt>LazyList</tt> class taught in Lecture/Recitation; instead, create a new class based on the <tt>Lazy</tt> class of the previous levels.
+
+<pre>
+<b>jshell&gt; UnaryOperator&lt;Integer&gt; op = x -&gt; {</b>
+<b>   ...&gt; System.out.println("op called");</b>
+<b>   ...&gt; return x + 1;</b>
+<b>   ...&gt; }</b>
+<b>jshell&gt; LazyList&lt;Integer&gt; list = LazyList.generate(10000, 0, op)</b>
+<b>jshell&gt; list.get(0)</b>
+$.. ==&gt; 0
+<b>jshell&gt; list.get(5)</b>
+op called
+op called
+op called
+op called
+op called
+$.. ==&gt; 5
+<b>jshell&gt; list.indexOf(2)</b>
+$.. ==&gt; 2
+<b>jshell&gt; list.indexOf(10)</b>
+op called
+op called
+op called
+op called
+op called
+$.. ==&gt; 10
+<b>jshell&gt; list.get(7)</b>
+$.. ==&gt; 7
+<b>jshell&gt; list.get(12)</b>
+op called
+op called
+$.. ==&gt; 12
+<b>jshell&gt; /exit</b>
+</pre>
+
+<p>
+Check the format correctness of the output by running the following on the command line:
+<pre>
+$ javac -Xlint:rawtypes *.java
+$ jshell -q your_java_files_in_bottom-up_dependency_order &lt; test6.jsh
+</pre>
+<p>
+Check your styling by issuing the following
+</p>
+<pre>
+$ checkstyle *.java
+</pre>
