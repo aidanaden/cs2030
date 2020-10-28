@@ -17,7 +17,7 @@ public class Lazy<T extends Comparable<?>> {
 
     static public <T extends Comparable<?>> Lazy<T> of(T value) {
 
-        Supplier<T> s = () -> value;
+        Supplier<T> s = () -> (value);
         return Lazy.of(s);
     } 
 
