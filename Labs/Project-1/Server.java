@@ -28,6 +28,10 @@ public class Server {
         return this.isAvailable;
     }
 
+    public boolean isAvailable() {
+        return this.isAvailable;
+    }
+
     public double getNextAvailableTime() {
         return this.nextAvailableTime;
     }

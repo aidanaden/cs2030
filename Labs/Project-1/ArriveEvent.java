@@ -170,7 +170,7 @@ public class ArriveEvent extends Event {
 
         if (waitingServers.size() > 0) {
 
-            int soonestServerIndex = getSoonestWaitingServerIndex(waitingServers);
+            int soonestServerIndex = getSoonestAvailableServerIndex(waitingServers);
 
             Server selectedServer = waitingServers.get(soonestServerIndex);
 
