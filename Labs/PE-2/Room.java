@@ -1,9 +1,10 @@
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class Room implements Tickable {
 
-    private final Room previousRoom;
+    private final Optional<Room> previousRoom;
     private final String roomName;
     private final ArrayList<Tickable> roomObjects;
 
@@ -11,21 +12,21 @@ public class Room implements Tickable {
 
         this.roomName = roomName;
         this.roomObjects = new ArrayList<Tickable>();
-        this.previousRoom = null;
+        this.previousRoom = Optional.empty();
     }
 
     Room(String roomName, ArrayList<Tickable> roomObjects) {
      
         this.roomName = roomName;
         this.roomObjects = roomObjects;
-        this.previousRoom = null;
+        this.previousRoom = Optional.empty();
     }
 
-    Room(String roomName, ArrayList<Tickable> roomObjects, Room previousRoom) {
+    Room(String roomName, ArrayList<Tickable> roomObjects, Optional<Room> previousRoom) {
 
         this.roomName = roomName;
-        this.previousRoom = previousRoom;
         this.roomObjects = roomObjects;
+        this.previousRoom = previousRoom;
     }
 
     public String getName() {
@@ -68,14 +69,12 @@ public class Room implements Tickable {
             newRoomObjects.add(newT);
         }
 
-        return new Room(this.roomName, newRoomObjects);
+        return new Room(this.roomName, newRoomObjects, this.previousRoom);
     }
 
     public Room tick(Function<ArrayList<Tickable>, ArrayList<Tickable>> mapper) {
      
-
-        ArrayList<Tickable> newRoomObjects = mapper.apply(this.roomObjects);
-        
+        ArrayList<Tickable> newRoomObjects = mapper.apply(this.roomObjects);   
         ArrayList<Tickable> updatedNewRoomObjects = new ArrayList<Tickable>();
 
         for (Tickable t : newRoomObjects) {
@@ -84,32 +83,62 @@ public class Room implements Tickable {
             updatedNewRoomObjects.add(newT);
         }
 
-        return new Room(this.roomName, updatedNewRoomObjects);
+        return new Room(this.roomName, updatedNewRoomObjects, this.previousRoom);
     }
 
     public Room go(Function<ArrayList<Tickable>, Room> mapper) {
 
         Room newRoom = mapper.apply(this.roomObjects);
+        ArrayList<Tickable> combinedRoomObjects = new ArrayList<Tickable>();
         
-        if (newRoom.getRoomObjects().containsAll(this.roomObjects)) {
+        if (getSwordIndex().isPresent()) {
 
-            return newRoom;
-        
-        } else {
+            Tickable t = this.roomObjects.get(getSwordIndex().get());
+            Sword s = (Sword) t;
 
-            ArrayList<Tickable> combinedRoomObjects = new ArrayList<Tickable>();
-            combinedRoomObjects.addAll(this.roomObjects);
-            combinedRoomObjects.addAll(newRoom.getRoomObjects());
-
-            Room combinedNewRoom = new Room(newRoom.getName(), combinedRoomObjects);
-
-            return combinedNewRoom;
+            if (s.isTaken()) {
+                combinedRoomObjects.add(t);
+                this.roomObjects.remove(t);
+            }
         }
+
+        combinedRoomObjects.addAll(newRoom.getRoomObjects());
+        return new Room(newRoom.roomName, combinedRoomObjects, Optional.ofNullable(this));
     }
 
     public Room back() {
 
-        return this.previousRoom.tick();
+        Function<ArrayList<Tickable>, ArrayList<Tickable>> f = x -> {
+
+            if (getSwordIndex().isPresent()) {
+
+                Tickable t = this.roomObjects.get(getSwordIndex().get());
+                Sword s = (Sword) t;
+
+                if (s.isTaken()) {
+
+                    x.add(t);
+                    this.roomObjects.remove(t);
+                }    
+            }
+
+            return x;
+        };
+
+        return this.previousRoom.get().tick(f);
+    }
+
+    public Optional<Integer> getSwordIndex() {
+
+        for (Tickable t : this.roomObjects) {
+
+            if (t instanceof Sword) {
+
+                return Optional.of(this.roomObjects.indexOf(t));
+            }
+        }
+
+        return Optional.empty();
     }
 }
 

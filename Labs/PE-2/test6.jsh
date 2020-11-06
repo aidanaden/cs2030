@@ -1,3 +1,9 @@
+/open Tickable.java
+/open Room.java
+/open Candle.java
+/open Troll.java
+/open Sword.java
+/open actions.jsh
 Room r1 = new Room("foyer").add(new Candle())
 Room r2 = r1.go(x -> new Room("dining").add(new Troll()))
 Room r3 = r2.go(x -> new Room("library").add(new Sword()))
