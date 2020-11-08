@@ -33,6 +33,8 @@ Function<ArrayList<Tickable>, ArrayList<Tickable>> takeSword = x -> {
 
 Function<ArrayList<Tickable>, ArrayList<Tickable>> dropSword = x -> {
     
+    ArrayList<Tickable> newX = new ArrayList<Tickable>(x);
+
     for (int i = 0; i < x.size(); i++) {
 
         Tickable t = x.get(i);
@@ -43,7 +45,7 @@ Function<ArrayList<Tickable>, ArrayList<Tickable>> dropSword = x -> {
 
             if (s.isTaken()) {
 
-                x.remove(i);
+                newX.set(i, new Sword());
                 System.out.println("--> You have dropped sword.");
 
             } else {
@@ -55,7 +57,7 @@ Function<ArrayList<Tickable>, ArrayList<Tickable>> dropSword = x -> {
         }
     }
 
-    return x;
+    return newX;
 }
 
 Function<ArrayList<Tickable>, ArrayList<Tickable>> killTroll = x -> {

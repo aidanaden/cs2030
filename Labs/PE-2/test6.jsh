@@ -26,4 +26,3 @@ tick(takeSword).
 back().
 tick().
 tick(killTroll)
-/exit

@@ -12,14 +12,14 @@ public class Room implements Tickable {
 
         this.roomName = roomName;
         this.roomObjects = new ArrayList<Tickable>();
-        this.previousRoom = Optional.empty();
+        this.previousRoom = Optional.ofNullable(this);
     }
 
     Room(String roomName, ArrayList<Tickable> roomObjects) {
      
         this.roomName = roomName;
         this.roomObjects = roomObjects;
-        this.previousRoom = Optional.empty();
+        this.previousRoom = Optional.ofNullable(this);
     }
 
     Room(String roomName, ArrayList<Tickable> roomObjects, Optional<Room> previousRoom) {
@@ -110,6 +110,8 @@ public class Room implements Tickable {
 
         Function<ArrayList<Tickable>, ArrayList<Tickable>> f = x -> {
 
+            ArrayList<Tickable> newX = new ArrayList<Tickable>(x);
+
             if (getSwordIndex().isPresent()) {
 
                 Tickable t = this.roomObjects.get(getSwordIndex().get());
@@ -117,12 +119,11 @@ public class Room implements Tickable {
 
                 if (s.isTaken()) {
 
-                    x.add(t);
-                    this.roomObjects.remove(t);
+                    newX.add(t);
                 }    
             }
 
-            return x;
+            return newX;
         };
 
         return this.previousRoom.get().tick(f);
