@@ -3,6 +3,7 @@
 /open Candle.java
 /open Troll.java
 /open Sword.java
+/open actions.jsh
 new Room("foyer").add(new Sword()).tick(killTroll)
 new Room("foyer").add(new Sword()).add(new Troll()).tick(killTroll)
 new Room("foyer").add(new Sword()).add(new Troll()).tick(takeSword).tick(killTroll)

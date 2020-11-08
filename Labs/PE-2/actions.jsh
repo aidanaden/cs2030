@@ -1,5 +1,7 @@
 Function<ArrayList<Tickable>, ArrayList<Tickable>> takeSword = x -> {
 
+    ArrayList<Tickable> newX = new ArrayList<Tickable>(x);
+
     for (int i = 0; i < x.size(); i++) {
 
         Tickable t = x.get(i);
@@ -11,7 +13,7 @@ Function<ArrayList<Tickable>, ArrayList<Tickable>> takeSword = x -> {
             if (!s.isTaken()) {
 
                 Sword takenSword = new Sword(true);
-                x.set(i, takenSword);
+                newX.set(i, (Tickable) takenSword);
 
                 System.out.println("--> You have taken sword.");
             }
@@ -21,12 +23,12 @@ Function<ArrayList<Tickable>, ArrayList<Tickable>> takeSword = x -> {
                 System.out.println("--> You already have sword.");
             }
 
-            return x;
+            return newX;
         }
     }
 
     System.out.println("--> There is no sword.");
-    return x;
+    return newX;
 }
 
 Function<ArrayList<Tickable>, ArrayList<Tickable>> dropSword = x -> {
@@ -58,6 +60,8 @@ Function<ArrayList<Tickable>, ArrayList<Tickable>> dropSword = x -> {
 
 Function<ArrayList<Tickable>, ArrayList<Tickable>> killTroll = x -> {
 
+    ArrayList<Tickable> newX = new ArrayList<Tickable>(x);
+
     for (int i = 0; i < x.size(); i++) {
 
         Tickable t1 = x.get(i);
@@ -74,7 +78,7 @@ Function<ArrayList<Tickable>, ArrayList<Tickable>> killTroll = x -> {
 
                     if (s.isTaken()) {
 
-                        x.remove(i);
+                        newX.remove(t1);
                         System.out.println("--> Troll is killed.");
                     
                     } else {
@@ -82,17 +86,17 @@ Function<ArrayList<Tickable>, ArrayList<Tickable>> killTroll = x -> {
                         System.out.println("--> You have no sword.");
                     }
 
-                    return x;
+                    return newX;
                 }
             }
 
             System.out.println("--> You have no sword."); 
-            return x;           
+            return newX;           
         }
     }
 
     System.out.println("--> There is no troll");
-    return x;
+    return newX;
 }
 
 

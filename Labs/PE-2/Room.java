@@ -103,7 +103,7 @@ public class Room implements Tickable {
         }
 
         combinedRoomObjects.addAll(newRoom.getRoomObjects());
-        return new Room(newRoom.roomName, combinedRoomObjects, Optional.ofNullable(this));
+        return new Room(newRoom.getName(), combinedRoomObjects, Optional.ofNullable(this));
     }
 
     public Room back() {
