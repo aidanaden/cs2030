@@ -1,30 +1,13 @@
-// package cs2030.Simulator;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
-public abstract class Event {
-    
-    private final double startTime;
-    private final Customer customer;
-    private final List<Server> servers;
-    
-    Event(double startTime, Customer customer, List<Server> servers) {
-        this.startTime = startTime;
-        this.customer = customer;
-        this.servers = servers;
-    }
+public class Event {
 
-    public double getStartTime() {
-        return this.startTime;
-    }
+    private final Function<Shop, Pair<Shop, Event>> func;
 
-    public Customer getCustomer() {
-        return this.customer;
-    }
-
-    public List<Server> getServers() {
-        return this.servers;
+    Event(Function<Shop, Pair<Shop, Event>> func) {
+        this.func = func;
     }
 
     /**
@@ -56,5 +39,7 @@ public abstract class Event {
         return updatedServers;
     }
 
-    public abstract Event execute();
+    public final Pair<Shop, Event> execute(Shop shop) { // declared final to avoid overriding
+        return this.func.apply(shop); // func is the Function property
+    }
 }

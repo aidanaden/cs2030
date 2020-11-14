@@ -1,37 +1,29 @@
-import java.util.ArrayList;
-import java.util.List;
-
 public class ServeEvent extends Event {
 
-    ServeEvent(double serviceStartTime, Customer customer, List<Server> servers) {
-        super(serviceStartTime, customer, servers);
+    private final double serviceStartTime;
+    private final Customer customer;
+    private final int serverId;
+
+    ServeEvent(double serviceStartTime, Customer customer, int serverId) {
+
+        super(x -> {
+
+            Server server = x.find(y -> y.getIdentifier() == serverId).get();
+
+            Server updatedServer = new Server(server.getIdentifier(), true, false, server.getNextAvailableTime());
+
+            return new Pair<Shop, Event>(x.replace(updatedServer), new DoneEvent(serviceStartTime + 1.0, customer, serverId));
+        });
+
+        this.serviceStartTime = serviceStartTime;
+        this.customer = customer;
+        this.serverId = serverId;
     }
 
-    @Override
     public String toString() {
-
-        int serverLastIndex = getServers().size() - 1;
-        int selectedServerId = getServers().get(serverLastIndex).getIdentifier();
         
         return String.format("%.3f %d served by %d", 
-                                getStartTime(), getCustomer().getId(), 
-                                selectedServerId);
-    }
-
-    @Override
-    public Event execute() {
-
-        int lastIndex = getServers().size() - 1;
-        Server selectedServer = getServers().get(lastIndex);
-
-        double nextAvailableTime = selectedServer.getNextAvailableTime();
-
-        ArrayList<Server> updatedServers = updateSelectedServerInServers(getServers(), 
-                                                                        selectedServer, 
-                                                                        true, 
-                                                                        false, 
-                                                                        nextAvailableTime);
-
-        return new DoneEvent(super.getStartTime() + 1.0, getCustomer(), updatedServers);
+                                serviceStartTime, customer.getId(), 
+                                serverId);
     }
 }

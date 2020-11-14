@@ -1,39 +1,30 @@
-import java.util.ArrayList;
-import java.util.List;
-
 public class WaitEvent extends Event {
 
-    WaitEvent(Double arriveTime, Customer customer, List<Server> servers) {
+    private final double arriveTime;
+    private final Customer customer;
+    private final int serverId;
 
-        super(arriveTime, customer, servers);
-        //return new Event(customer.getArrivalTime(), customer, servers);
+    WaitEvent(Double arriveTime, Customer customer, int serverId) {
+
+        super(x -> {
+
+            Server server = x.find(y -> y.getIdentifier() == serverId).get();
+
+            Server updatedServer = new Server(serverId, false, false, server.getNextAvailableTime() + 1.0);
+
+            return new Pair<Shop, Event>(x.replace(updatedServer), new ServeEvent(server.getNextAvailableTime(), customer, serverId));
+        });
+        
+
+        this.arriveTime = arriveTime;
+        this.customer = customer;
+        this.serverId = serverId;
     }
 
-    @Override
     public String toString() {
-
-        int serverLastIndex = getServers().size() - 1;
-        int selectedServerId = getServers().get(serverLastIndex).getIdentifier();
         
         return String.format("%.3f %d waits to be served by %d", 
-                            getStartTime(), getCustomer().getId(), 
-                            selectedServerId);
-    }
-
-    @Override
-    public Event execute() {
-        
-        int lastIndex = getServers().size() - 1;
-        Server selectedServer = getServers().get(lastIndex);
-
-        double nextAvailableTime = selectedServer.getNextAvailableTime() + 1.0;
-
-        ArrayList<Server> updatedServers = updateSelectedServerInServers(getServers(), 
-                                                                        selectedServer, 
-                                                                        false, false, 
-                                                                        nextAvailableTime);
-
-        // if customer arrives BEFORE server is ready
-        return new ServeEvent(selectedServer.getNextAvailableTime(), getCustomer(), updatedServers);
+                            arriveTime, customer.getId(), 
+                            serverId);
     }
 }
