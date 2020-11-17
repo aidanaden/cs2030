@@ -1,5 +1,4 @@
 package cs2030.simulator;
-
 import java.util.Comparator;
 
 public class CustomerComparator implements Comparator<Customer> {

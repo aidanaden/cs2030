@@ -1,3 +1,5 @@
+package cs2030.simulator;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.ArrayList;
