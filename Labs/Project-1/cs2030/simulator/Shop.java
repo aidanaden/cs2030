@@ -34,7 +34,7 @@ public class Shop {
         this.numServers = numServers;
         List<Server> servers = Stream.iterate(1, n -> n + 1)
                                      .limit(numServers)
-                                     .map(x -> new Server(x, true, false, 0.0, 0, maxWaitingCustomers, 0.0))
+                                     .map(x -> new Server(x, true, false, 0.0, maxWaitingCustomers, 0.0))
                                      .collect(Collectors.toList());
 
         this.servers = new ArrayList<Server>(servers);

@@ -35,7 +35,7 @@ public class ArriveEvent extends Event {
             }
 
             // HANDLE WAIT EVENT FOR MULTI CUSTOMER SERVER
-            Optional<Server> optionalMultipleCustomerWaitingServer = x.find(y -> (y.getNumWaitingCustomers() > 0) && (y.getNumWaitingCustomers() < y.getMaxWaitingCustomers()));
+            Optional<Server> optionalMultipleCustomerWaitingServer = x.find(y -> (y.getWaitingCustomers().size() > 0) && (y.getWaitingCustomers().size() < y.getMaxWaitingCustomers()));
 
             if (optionalMultipleCustomerWaitingServer.isPresent()) {
                 

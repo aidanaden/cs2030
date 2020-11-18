@@ -1,5 +1,7 @@
 package cs2030.simulator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class WaitEvent extends Event {
@@ -10,15 +12,21 @@ public class WaitEvent extends Event {
 
             Server server = x.find(y -> y.getIdentifier() == serverId).get();
 
+            List<Customer> existingWaitingCustomers = server.getWaitingCustomers();
+            List<Customer> updatedWaitingCustomers = new ArrayList<Customer>(existingWaitingCustomers);
+            updatedWaitingCustomers.add(customer);
+
             Server updatedServer = new Server(serverId, 
                                               false, 
                                               true, 
                                               server.getNextAvailableTime(), 
-                                              server.getNumWaitingCustomers() + 1, 
+                                              updatedWaitingCustomers, 
                                               server.getMaxWaitingCustomers(), 
                                               server.getWaitingCustomerServeTimes() + customer.getServiceTime());
 
-            return new Pair<Shop, Event>(x.replace(updatedServer), new ServeEvent(updatedServer.getNextAvailableTime() + server.getWaitingCustomerServeTimes(), customer, serverId));
+            return new Pair<Shop, Event>(x.replace(updatedServer), new ServeEvent(updatedServer.getNextAvailableTime() + server.getWaitingCustomerServeTimes(), 
+                                                                                  customer, 
+                                                                                  serverId));
 
         }, arriveTime, customer, Optional.of(serverId));
     }

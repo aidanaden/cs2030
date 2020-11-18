@@ -1,13 +1,17 @@
 package cs2030.simulator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Server {
     
     private final int identifier;
     private final boolean isAvailable;
     private final boolean hasWaitingCustomer;
     private final double nextAvailableTime;
-    private final int numWaitingCustomers;
+    // private final int numWaitingCustomers;
     private final int maxWaitingCustomers;
+    private final List<Customer> waitingCustomers;
     private final double waitingCustomerServeTimes;
 
     Server(int identifier, boolean isAvailable, 
@@ -17,20 +21,34 @@ public class Server {
         this.isAvailable = isAvailable;
         this.hasWaitingCustomer = hasWaitingCustomer;
         this.nextAvailableTime = nextAvailableTime;
-        this.numWaitingCustomers = hasWaitingCustomer ? 1 : 0;
+        // this.numWaitingCustomers = hasWaitingCustomer ? 1 : 0;
         this.maxWaitingCustomers = 1;
+        this.waitingCustomers = new ArrayList<>(1);
         this.waitingCustomerServeTimes = 0.0;
     }
 
     Server(int identifier, boolean isAvailable, 
-    boolean hasWaitingCustomer, double nextAvailableTime, int numWaitingCustomers, int maxWaitingCustomers, double waitingCustomerServeTimes) {
+    boolean hasWaitingCustomer, double nextAvailableTime, int maxWaitingCustomers, double waitingCustomerServeTimes) {
 
         this.identifier = identifier;
         this.isAvailable = isAvailable;
         this.hasWaitingCustomer = hasWaitingCustomer;
         this.nextAvailableTime = nextAvailableTime;
-        this.numWaitingCustomers = numWaitingCustomers;
         this.maxWaitingCustomers = maxWaitingCustomers;
+        this.waitingCustomers = new ArrayList<>(maxWaitingCustomers);
+        this.waitingCustomerServeTimes = waitingCustomerServeTimes;
+    }
+
+    Server(int identifier, boolean isAvailable, 
+    boolean hasWaitingCustomer, double nextAvailableTime, List<Customer> waitingCustomers, int maxWaitingCustomers, double waitingCustomerServeTimes) {
+
+        this.identifier = identifier;
+        this.isAvailable = isAvailable;
+        this.hasWaitingCustomer = hasWaitingCustomer;
+        this.nextAvailableTime = nextAvailableTime;
+        this.maxWaitingCustomers = maxWaitingCustomers;
+        this.waitingCustomers = new ArrayList<>(maxWaitingCustomers);
+        this.waitingCustomers.addAll(waitingCustomers);
         this.waitingCustomerServeTimes = waitingCustomerServeTimes;
     }
 
@@ -54,8 +72,8 @@ public class Server {
         return this.nextAvailableTime;
     }
 
-    public int getNumWaitingCustomers() {
-        return numWaitingCustomers;
+    public List<Customer> getWaitingCustomers() {
+        return waitingCustomers;
     }
 
     public int getMaxWaitingCustomers() {

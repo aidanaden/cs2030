@@ -1,5 +1,7 @@
 package cs2030.simulator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class ServeEvent extends Event {
@@ -10,15 +12,25 @@ public class ServeEvent extends Event {
 
             Server server = x.find(y -> y.getIdentifier() == serverId).get();
 
+            List<Customer> existingWaitingCustomers = server.getWaitingCustomers();
+        
+            List<Customer> updatedWaitingCustomers = new ArrayList<Customer>();
+            updatedWaitingCustomers.addAll(existingWaitingCustomers);
+            updatedWaitingCustomers.remove(customer);
+
+            // System.out.println("Updated Waiting Customers to DoneEvent: " + updatedWaitingCustomers);
+
             Server updatedServer = new Server(server.getIdentifier(), 
                                               false, 
-                                              (server.getNumWaitingCustomers() > 1) ? true : false, 
+                                              (updatedWaitingCustomers.size() > 0) ? true : false, 
                                               serviceStartTime + customer.getServiceTime(), 
-                                              (server.getNumWaitingCustomers() > 1) ? server.getNumWaitingCustomers() - 1 : 0,
+                                              updatedWaitingCustomers,
                                               server.getMaxWaitingCustomers(), 
-                                              (server.getNumWaitingCustomers() > 1) ? server.getWaitingCustomerServeTimes() - customer.getServiceTime() : server.getWaitingCustomerServeTimes());
+                                              (updatedWaitingCustomers.size() > 0) ? (server.getWaitingCustomerServeTimes() - customer.getServiceTime()) : (server.getWaitingCustomerServeTimes()));
 
-            return new Pair<Shop, Event>(x.replace(updatedServer), new DoneEvent(serviceStartTime + customer.getServiceTime(), customer, serverId));
+            return new Pair<Shop, Event>(x.replace(updatedServer), new DoneEvent(serviceStartTime + customer.getServiceTime(), 
+                                                                                 customer, 
+                                                                                 serverId));
         
         }, serviceStartTime, customer, Optional.of(serverId));
 
@@ -27,8 +39,8 @@ public class ServeEvent extends Event {
     public String toString() {
         
         return String.format("%.3f %d served by server %d", 
-                                super.getStartTime(), 
-                                super.getCustomer().getId(), 
-                                super.getServerId());
+                             super.getStartTime(), 
+                             super.getCustomer().getId(), 
+                             super.getServerId());
     }
 }
