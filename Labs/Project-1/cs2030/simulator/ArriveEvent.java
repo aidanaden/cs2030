@@ -34,12 +34,25 @@ public class ArriveEvent extends Event {
                 }   
             }
 
-            // HANDLE WAIT EVENT 
-            Optional<Server> optionalWaitingServer = x.find(y -> !y.getHasWaitingCustomer());
+            // HANDLE WAIT EVENT FOR MULTI CUSTOMER SERVER
+            Optional<Server> optionalMultipleCustomerWaitingServer = x.find(y -> (y.getNumWaitingCustomers() > 0) && (y.getNumWaitingCustomers() < y.getMaxWaitingCustomers()));
 
-            if (optionalWaitingServer.isPresent()) {
+            if (optionalMultipleCustomerWaitingServer.isPresent()) {
+                
+                Server waitingServer = optionalMultipleCustomerWaitingServer.get();
 
-                Server waitingServer = optionalWaitingServer.get();
+                return new Pair<Shop, Event>(x, 
+                                             new WaitEvent(customer.getArrivalTime(), 
+                                                           customer, 
+                                                           waitingServer.getIdentifier()));
+            }
+
+            // HANDLE WAIT EVENT FOR SINGLE CUSTOMER SERVER
+            Optional<Server> optionalSingleCustomerWaitingServer = x.find(y -> !y.getHasWaitingCustomer());
+
+            if (optionalSingleCustomerWaitingServer.isPresent()) {
+
+                Server waitingServer = optionalSingleCustomerWaitingServer.get();
 
                 return new Pair<Shop, Event>(x, 
                                              new WaitEvent(customer.getArrivalTime(), 

@@ -21,9 +21,9 @@ public class Simulator {
      * @param arriveStartTimes Arrive times of the Customers.
      * @param serverNum Number of Servers serving the Customers.
      */
-    public Simulator(int seed, int serverNum, int customerNum, double arrivalRate, double serviceRate) {
+    public Simulator(int seed, int serverNum, int maxQueueLen, int customerNum, double arrivalRate, double serviceRate) {
 
-        this.shop = new Shop(serverNum);
+        this.shop = new Shop(serverNum, maxQueueLen);
         
         RandomGenerator rand = new RandomGenerator(seed, arrivalRate, serviceRate, 0);
         this.customerQueue = createCustomerQueue(customerNum, rand);

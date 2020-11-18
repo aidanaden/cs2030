@@ -10,7 +10,13 @@ public class ServeEvent extends Event {
 
             Server server = x.find(y -> y.getIdentifier() == serverId).get();
 
-            Server updatedServer = new Server(server.getIdentifier(), false, false, serviceStartTime + customer.getServiceTime());
+            Server updatedServer = new Server(server.getIdentifier(), 
+                                              false, 
+                                              (server.getNumWaitingCustomers() > 1) ? true : false, 
+                                              serviceStartTime + customer.getServiceTime(), 
+                                              (server.getNumWaitingCustomers() > 1) ? server.getNumWaitingCustomers() - 1 : 0,
+                                              server.getMaxWaitingCustomers(), 
+                                              (server.getNumWaitingCustomers() > 1) ? server.getWaitingCustomerServeTimes() - customer.getServiceTime() : server.getWaitingCustomerServeTimes());
 
             return new Pair<Shop, Event>(x.replace(updatedServer), new DoneEvent(serviceStartTime + customer.getServiceTime(), customer, serverId));
         

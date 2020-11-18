@@ -10,9 +10,15 @@ public class WaitEvent extends Event {
 
             Server server = x.find(y -> y.getIdentifier() == serverId).get();
 
-            Server updatedServer = new Server(serverId, false, true, server.getNextAvailableTime());
+            Server updatedServer = new Server(serverId, 
+                                              false, 
+                                              true, 
+                                              server.getNextAvailableTime(), 
+                                              server.getNumWaitingCustomers() + 1, 
+                                              server.getMaxWaitingCustomers(), 
+                                              server.getWaitingCustomerServeTimes() + customer.getServiceTime());
 
-            return new Pair<Shop, Event>(x.replace(updatedServer), new ServeEvent(server.getNextAvailableTime(), customer, serverId));
+            return new Pair<Shop, Event>(x.replace(updatedServer), new ServeEvent(updatedServer.getNextAvailableTime() + server.getWaitingCustomerServeTimes(), customer, serverId));
 
         }, arriveTime, customer, Optional.of(serverId));
     }

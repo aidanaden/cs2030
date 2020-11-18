@@ -29,6 +29,17 @@ public class Shop {
         this.servers = new ArrayList<Server>(servers);
     }
 
+    Shop(int numServers, int maxWaitingCustomers) {
+
+        this.numServers = numServers;
+        List<Server> servers = Stream.iterate(1, n -> n + 1)
+                                     .limit(numServers)
+                                     .map(x -> new Server(x, true, false, 0.0, 0, maxWaitingCustomers, 0.0))
+                                     .collect(Collectors.toList());
+
+        this.servers = new ArrayList<Server>(servers);
+    }
+
     public Optional<Server> find(Predicate<Server> pred) {
         
         Optional<Server> availableServer = servers.stream().filter(pred).findFirst();
