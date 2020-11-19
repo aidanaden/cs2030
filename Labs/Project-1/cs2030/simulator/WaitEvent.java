@@ -21,10 +21,9 @@ public class WaitEvent extends Event {
                                               true, 
                                               server.getNextAvailableTime(), 
                                               updatedWaitingCustomers, 
-                                              server.getMaxWaitingCustomers(), 
-                                              server.getWaitingCustomerServeTimes() + customer.getServiceTime());
+                                              server.getMaxWaitingCustomers());
 
-            return new Pair<Shop, Event>(x.replace(updatedServer), new ServeEvent(updatedServer.getNextAvailableTime() + server.getWaitingCustomerServeTimes(), 
+            return new Pair<Shop, Event>(x.replace(updatedServer), new ServeEvent(server.getNextAvailableTime(), 
                                                                                   customer, 
                                                                                   serverId));
 

@@ -12,23 +12,43 @@ public class DoneEvent extends Event {
 
             Server server = x.find(y -> y.getIdentifier() == serverId).get();
 
-            List<Customer> existingWaitingCustomers = server.getWaitingCustomers();
-            List<Customer> updatedWaitingCustomers = new ArrayList<Customer>();
+            if (server.getWaitingCustomers().size() > 0) {
 
-            if (existingWaitingCustomers.size() > 1) {
+                List<Customer> existingWaitingCustomers = server.getWaitingCustomers();
+                List<Customer> updatedWaitingCustomers = new ArrayList<Customer>();
                 updatedWaitingCustomers.addAll(existingWaitingCustomers);
-                updatedWaitingCustomers.remove(0);
+
+                Customer nextCustomer = updatedWaitingCustomers.get(0);
+
+                Server updatedServer = new Server(server.getIdentifier(), 
+                                                  false, 
+                                                  server.getHasWaitingCustomer(),
+                                                  server.getNextAvailableTime(), 
+                                                  updatedWaitingCustomers, 
+                                                  server.getMaxWaitingCustomers());
+
+                DoneEvent newDoneEvent = new DoneEvent(updatedServer.getNextAvailableTime(), 
+                                                       nextCustomer,
+                                                       serverId);
+
+                return new Pair<Shop, Event>(x.replace(updatedServer), newDoneEvent);
+            
+            } else {
+
+                Server updatedServer = new Server(server.getIdentifier(),
+                                                  true,
+                                                  false,
+                                                  server.getNextAvailableTime(),
+                                                  server.getWaitingCustomers(),
+                                                  server.getMaxWaitingCustomers());
+
+                DoneEvent newDoneEvent = new DoneEvent(server.getNextAvailableTime(), 
+                                                       customer, 
+                                                       serverId);
+
+                return new Pair<Shop, Event>(x.replace(updatedServer), newDoneEvent);
             }
 
-            Server updatedServer = new Server(server.getIdentifier(), 
-                                              (existingWaitingCustomers.size() > 0) ? false : true, 
-                                              (updatedWaitingCustomers.size() > 0) ? true : false, 
-                                              (existingWaitingCustomers.size() > 0) ? serviceStartTime + existingWaitingCustomers.get(0).getServiceTime() : serviceStartTime, 
-                                              updatedWaitingCustomers, 
-                                              server.getMaxWaitingCustomers(),
-                                              (updatedWaitingCustomers.size() > 0) ? server.getWaitingCustomerServeTimes() - existingWaitingCustomers.get(0).getServiceTime() : server.getWaitingCustomerServeTimes());
-
-            return new Pair<Shop, Event>(x.replace(updatedServer), null);
             
         }, serviceStartTime, customer, Optional.of(serverId));
     }

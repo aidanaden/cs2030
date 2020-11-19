@@ -130,14 +130,40 @@ public class Simulator {
                 Pair<Shop, Event> pair = currentEvent.execute(latestShop);
                 latestShop = pair.first();
 
-                if (currentEvent instanceof WaitEvent) {
-                    // waitCustomers++;
-                    totalWaitTime += pair.second().getStartTime() - currentEvent.getStartTime();
+                // if (currentEvent instanceof WaitEvent) {
+                //     // waitCustomers++;
+                //     totalWaitTime += pair.second().getStartTime() - currentEvent.getStartTime();
+                // }
+                if (currentEvent instanceof ServeEvent) {
+                    totalWaitTime += currentEvent.getStartTime() - currentEvent.getCustomer().getArrivalTime();
                 }
 
                 if ((currentEvent instanceof DoneEvent) == false) {
 
-                    this.eventQueue.add(pair.second());
+                    if ((currentEvent instanceof WaitEvent) == false) {
+                        
+                        this.eventQueue.add(pair.second());
+                    }
+                
+                } else {
+
+                    Event nextEvent = pair.second();
+                    int nextEventServerId = nextEvent.getServerId();
+
+                    Server updatedServer = latestShop.find(x -> x.getIdentifier() == nextEventServerId).get();
+
+                    if (updatedServer.getWaitingCustomers().size() > 0) {
+                        
+                        // System.out.println("DoneEvent server " + updatedServer.getIdentifier() + "contains waiting Customers!");
+
+                        ServeEvent serveEvent = new ServeEvent(nextEvent.getStartTime(), 
+                                                               nextEvent.getCustomer(), 
+                                                               nextEvent.getServerId());
+
+                        // totalWaitTime += serveEvent.getCustomer().getServiceTime();
+                        
+                        this.eventQueue.add(serveEvent);
+                    }
                 }
             
             } else {

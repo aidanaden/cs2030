@@ -25,8 +25,7 @@ public class ServeEvent extends Event {
                                               (updatedWaitingCustomers.size() > 0) ? true : false, 
                                               serviceStartTime + customer.getServiceTime(), 
                                               updatedWaitingCustomers,
-                                              server.getMaxWaitingCustomers(), 
-                                              (updatedWaitingCustomers.size() > 0) ? (server.getWaitingCustomerServeTimes() - customer.getServiceTime()) : (server.getWaitingCustomerServeTimes()));
+                                              server.getMaxWaitingCustomers());
 
             return new Pair<Shop, Event>(x.replace(updatedServer), new DoneEvent(serviceStartTime + customer.getServiceTime(), 
                                                                                  customer, 
