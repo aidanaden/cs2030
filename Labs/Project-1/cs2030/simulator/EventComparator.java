@@ -19,8 +19,15 @@ public class EventComparator implements Comparator<Event> {
 
             if (e1.getCustomer().getId() < e2.getCustomer().getId()) {
                 return -1;
-            } else {
+            } else if (e1.getCustomer().getId() > e2.getCustomer().getId()) {
                 return 1;
+            } else {
+
+                if ((e1 instanceof SERVER_REST) || (e1 instanceof SERVER_BACK)) {
+                    return -1;
+                } else {
+                    return 1;
+                }
             }
         }
     }

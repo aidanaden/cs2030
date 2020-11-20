@@ -45,7 +45,7 @@ public class Server {
         this.waitingCustomers = new ArrayList<>(maxWaitingCustomers);
         this.waitingCustomers.addAll(waitingCustomers);
     }
-
+    
     public int getIdentifier() {
         return this.identifier;
     }
