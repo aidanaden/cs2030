@@ -11,6 +11,8 @@ public class Server {
     private final double nextAvailableTime;
     private final int maxWaitingCustomers;
     private final List<Customer> waitingCustomers;
+    private final boolean isHuman;
+    public static List<Customer> sharedWaitingCustomers = new ArrayList<Customer>();
 
     Server(int identifier, boolean isAvailable, 
             boolean hasWaitingCustomer, double nextAvailableTime) {
@@ -21,6 +23,7 @@ public class Server {
         this.nextAvailableTime = nextAvailableTime;
         this.maxWaitingCustomers = 1;
         this.waitingCustomers = new ArrayList<>(1);
+        this.isHuman = true;
     }
 
     Server(int identifier, boolean isAvailable, 
@@ -32,6 +35,19 @@ public class Server {
         this.nextAvailableTime = nextAvailableTime;
         this.maxWaitingCustomers = maxWaitingCustomers;
         this.waitingCustomers = new ArrayList<>(maxWaitingCustomers);
+        this.isHuman = true;
+    }
+
+    Server(int identifier, boolean isAvailable, 
+    boolean hasWaitingCustomer, double nextAvailableTime, int maxWaitingCustomers, boolean isHuman) {
+
+        this.identifier = identifier;
+        this.isAvailable = isAvailable;
+        this.hasWaitingCustomer = hasWaitingCustomer;
+        this.nextAvailableTime = nextAvailableTime;
+        this.maxWaitingCustomers = maxWaitingCustomers;
+        this.waitingCustomers = new ArrayList<>(maxWaitingCustomers);
+        this.isHuman = isHuman;
     }
 
     Server(int identifier, boolean isAvailable, 
@@ -44,7 +60,21 @@ public class Server {
         this.maxWaitingCustomers = maxWaitingCustomers;
         this.waitingCustomers = new ArrayList<>(maxWaitingCustomers);
         this.waitingCustomers.addAll(waitingCustomers);
+        this.isHuman = true;
     }
+
+    // Server(int identifier, boolean isAvailable, 
+    // boolean hasWaitingCustomer, double nextAvailableTime, List<Customer> waitingCustomers, int maxWaitingCustomers, boolean isHuman) {
+
+    //     this.identifier = identifier;
+    //     this.isAvailable = isAvailable;
+    //     this.hasWaitingCustomer = hasWaitingCustomer;
+    //     this.nextAvailableTime = nextAvailableTime;
+    //     this.maxWaitingCustomers = maxWaitingCustomers;
+    //     this.waitingCustomers = new ArrayList<>(maxWaitingCustomers);
+    //     this.waitingCustomers.addAll(waitingCustomers);
+    //     this.isHuman = isHuman;
+    // }
     
     public int getIdentifier() {
         return this.identifier;
@@ -72,6 +102,14 @@ public class Server {
 
     public int getMaxWaitingCustomers() {
         return maxWaitingCustomers;
+    }
+
+    public int getNumWaitingCustomers() {
+        if (!isHuman) {
+            return Server.sharedWaitingCustomers.size();
+        } else {
+            return this.waitingCustomers.size();
+        }
     }
 
     @Override

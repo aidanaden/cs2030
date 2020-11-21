@@ -18,17 +18,19 @@ public class SERVER_BACK extends Event {
             updatedWaitingCustomers.addAll(existingWaitingCustomers);
 
             Server updatedServer = new Server(server.getIdentifier(), 
-                                              serverPreviousAvailable, 
+                                              true, 
                                               server.getHasWaitingCustomer(), 
                                               server.getNextAvailableTime(),
                                               updatedWaitingCustomers,
                                               server.getMaxWaitingCustomers());
 
             return new Pair<Shop, Event>(x.replace(updatedServer), new DoneEvent(serviceStartTime, 
-                                                                                 customer, 
-                                                                                 serverId));
+                                                                                 (updatedWaitingCustomers.size() > 0) ? updatedWaitingCustomers.get(0) : customer, 
+                                                                                 serverId,
+                                                                                 false,
+                                                                                 0));
         
-        }, serviceStartTime, customer, Optional.of(serverId));
+        }, serviceStartTime, customer, Optional.of(serverId), false , 0);
 
     }
 

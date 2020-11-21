@@ -6,35 +6,76 @@ import java.util.Optional;
 
 public class WaitEvent extends Event {
 
-    WaitEvent(Double arriveTime, Customer customer, int serverId) {
+    WaitEvent(Double arriveTime, Customer customer, int serverId, boolean isHuman, int serverMainId) {
 
         super(x -> {
 
             Server server = x.find(y -> y.getIdentifier() == serverId).get();
 
-            List<Customer> existingWaitingCustomers = server.getWaitingCustomers();
-            List<Customer> updatedWaitingCustomers = new ArrayList<Customer>(existingWaitingCustomers);
-            updatedWaitingCustomers.add(customer);
+            if (server instanceof SelfCheckoutServer) {
 
-            Server updatedServer = new Server(serverId, 
-                                              false, 
-                                              true, 
-                                              server.getNextAvailableTime(), 
-                                              updatedWaitingCustomers, 
-                                              server.getMaxWaitingCustomers());
+                SelfCheckoutServer selfCheckoutServer = (SelfCheckoutServer) server;
+                Server.sharedWaitingCustomers.add(customer);
 
-            return new Pair<Shop, Event>(x.replace(updatedServer), new ServeEvent(server.getNextAvailableTime(), 
-                                                                                  customer, 
-                                                                                  serverId));
+                Server updatedSelfCheckoutServer = new SelfCheckoutServer(serverId, 
+                                                                          selfCheckoutServer.getMainId(),
+                                                                          false, 
+                                                                          true, 
+                                                                          server.getNextAvailableTime(), 
+                                                                          server.getMaxWaitingCustomers());
 
-        }, arriveTime, customer, Optional.of(serverId));
+                return new Pair<Shop, Event>(x.replace(updatedSelfCheckoutServer), new ServeEvent(server.getNextAvailableTime(), 
+                                                                                                  customer, 
+                                                                                                  serverId,
+                                                                                                  isHuman,
+                                                                                                  serverMainId));
+
+            } else {
+
+                List<Customer> existingWaitingCustomers = server.getWaitingCustomers();
+                List<Customer> updatedWaitingCustomers = new ArrayList<Customer>(existingWaitingCustomers);
+                updatedWaitingCustomers.add(customer);
+
+                Server updatedServer = new Server(serverId, 
+                                                false, 
+                                                true, 
+                                                server.getNextAvailableTime(), 
+                                                updatedWaitingCustomers, 
+                                                server.getMaxWaitingCustomers());
+
+                return new Pair<Shop, Event>(x.replace(updatedServer), new ServeEvent(server.getNextAvailableTime(), 
+                                                                                      customer, 
+                                                                                      serverId,
+                                                                                      isHuman,
+                                                                                      serverMainId));
+            }
+
+            
+
+        }, arriveTime, customer, Optional.of(serverId), isHuman, serverMainId);
     }
 
     public String toString() {
+
+        String baseStr = String.format("%.3f %d", 
+                                       super.getStartTime(),
+                                       super.getCustomer().getId());
+
+        if (super.getCustomer().getIsGreedy()) {
+            baseStr += "(greedy)";
+        }
+
+        baseStr += " waits to be served by ";
+
+        if (super.getIsHuman()) {
+
+            baseStr += String.format("server %d", super.getServerId());
+
+        } else {
+
+            baseStr += String.format("self-check %d", super.getServerMainId());
+        }
         
-        return String.format("%.3f %d waits to be served by server %d", 
-                            super.getStartTime(), 
-                            super.getCustomer().getId(), 
-                            super.getServerId());
+        return baseStr;
     }
 }

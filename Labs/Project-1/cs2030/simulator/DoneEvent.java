@@ -6,59 +6,122 @@ import java.util.Optional;
 
 public class DoneEvent extends Event {
     
-    DoneEvent(Double serviceStartTime, Customer customer, int serverId) {
+    DoneEvent(Double serviceStartTime, Customer customer, int serverId, boolean isHuman, int serverMainId) {
 
         super(x -> {
 
             Server server = x.find(y -> y.getIdentifier() == serverId).get();
 
-            if (server.getWaitingCustomers().size() > 0) {
+            if (server instanceof SelfCheckoutServer) {
 
-                List<Customer> existingWaitingCustomers = server.getWaitingCustomers();
-                List<Customer> updatedWaitingCustomers = new ArrayList<Customer>();
-                updatedWaitingCustomers.addAll(existingWaitingCustomers);
+                SelfCheckoutServer selfCheckoutServer = (SelfCheckoutServer) server;
 
-                Customer nextCustomer = updatedWaitingCustomers.get(0);
+                if (Server.sharedWaitingCustomers.size() > 0) {
 
-                Server updatedServer = new Server(server.getIdentifier(), 
-                                                  false, 
-                                                  server.getHasWaitingCustomer(),
-                                                  server.getNextAvailableTime(), 
-                                                  updatedWaitingCustomers, 
-                                                  server.getMaxWaitingCustomers());
+                    Customer nextCustomer = Server.sharedWaitingCustomers.get(0);
 
-                DoneEvent newDoneEvent = new DoneEvent(updatedServer.getNextAvailableTime(), 
-                                                       nextCustomer,
-                                                       serverId);
+                    Server updatedServer = new SelfCheckoutServer(server.getIdentifier(), 
+                                                                  selfCheckoutServer.getMainId(), 
+                                                                  false, 
+                                                                  selfCheckoutServer.getHasWaitingCustomer(),
+                                                                  server.getNextAvailableTime(), 
+                                                                  server.getMaxWaitingCustomers());
 
-                return new Pair<Shop, Event>(x.replace(updatedServer), newDoneEvent);
-            
+                    DoneEvent newDoneEvent = new DoneEvent(updatedServer.getNextAvailableTime(), 
+                                                           nextCustomer, 
+                                                           serverId,
+                                                           isHuman,
+                                                           serverMainId);
+
+                    return new Pair<Shop, Event>(x.replace(updatedServer), newDoneEvent);
+                
+                } else {
+
+                    Server updatedServer = new SelfCheckoutServer(server.getIdentifier(), 
+                                                                  selfCheckoutServer.getMainId(), 
+                                                                  true, 
+                                                                  false, 
+                                                                  server.getNextAvailableTime(), 
+                                                                  server.getMaxWaitingCustomers());
+
+                    DoneEvent newDoneEvent = new DoneEvent(server.getNextAvailableTime(),
+                                                           customer,
+                                                           serverId,
+                                                           isHuman,
+                                                           serverMainId);
+
+                    return new Pair<Shop, Event>(x.replace(updatedServer), newDoneEvent);
+                }
+
             } else {
 
-                Server updatedServer = new Server(server.getIdentifier(),
-                                                  true,
-                                                  false,
-                                                  server.getNextAvailableTime(),
-                                                  server.getWaitingCustomers(),
-                                                  server.getMaxWaitingCustomers());
+                if (server.getWaitingCustomers().size() > 0) {
 
-                DoneEvent newDoneEvent = new DoneEvent(server.getNextAvailableTime(), 
-                                                       customer, 
-                                                       serverId);
-
-                return new Pair<Shop, Event>(x.replace(updatedServer), newDoneEvent);
+                    List<Customer> existingWaitingCustomers = server.getWaitingCustomers();
+                    List<Customer> updatedWaitingCustomers = new ArrayList<Customer>();
+                    updatedWaitingCustomers.addAll(existingWaitingCustomers);
+    
+                    Customer nextCustomer = updatedWaitingCustomers.get(0);
+    
+                    Server updatedServer = new Server(server.getIdentifier(), 
+                                                      false, 
+                                                      server.getHasWaitingCustomer(),
+                                                      server.getNextAvailableTime(), 
+                                                      updatedWaitingCustomers, 
+                                                      server.getMaxWaitingCustomers());
+    
+                    DoneEvent newDoneEvent = new DoneEvent(updatedServer.getNextAvailableTime(), 
+                                                           nextCustomer,
+                                                           serverId,
+                                                           isHuman,
+                                                           serverMainId);
+    
+                    return new Pair<Shop, Event>(x.replace(updatedServer), newDoneEvent);
+                
+                } else {
+    
+                    Server updatedServer = new Server(server.getIdentifier(),
+                                                      true,
+                                                      false,
+                                                      server.getNextAvailableTime(),
+                                                      server.getWaitingCustomers(),
+                                                      server.getMaxWaitingCustomers());
+    
+                    DoneEvent newDoneEvent = new DoneEvent(server.getNextAvailableTime(), 
+                                                           customer, 
+                                                           serverId,
+                                                           isHuman,
+                                                           serverMainId);
+    
+                    return new Pair<Shop, Event>(x.replace(updatedServer), newDoneEvent);
+                }
             }
 
-            
-        }, serviceStartTime, customer, Optional.of(serverId));
+        }, serviceStartTime, customer, Optional.of(serverId), isHuman, serverMainId);
     }
 
     public String toString() {
+
+        String baseStr = String.format("%.3f %d", 
+                                       super.getStartTime(),
+                                       super.getCustomer().getId());
+
+        if (super.getCustomer().getIsGreedy()) {
+            baseStr += "(greedy)";
+        }
+
+        baseStr += " done serving by ";
+
+        if (super.getIsHuman()) {
+
+            baseStr += String.format("server %d", super.getServerId());
+
+        } else {
+
+            baseStr += String.format("self-check %d", super.getServerId());
+        }
         
-        return String.format("%.3f %d done serving by server %d", 
-                            super.getStartTime(), 
-                            super.getCustomer().getId(), 
-                            super.getServerId());
+        return baseStr;        
     }
 }
     

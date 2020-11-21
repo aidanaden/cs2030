@@ -23,12 +23,16 @@ public class Simulator {
      * @param arriveStartTimes Arrive times of the Customers.
      * @param serverNum Number of Servers serving the Customers.
      */
-    public Simulator(int seed, int serverNum, int maxQueueLen, int customerNum, double arrivalRate, double serviceRate, double restRate, double probabilityRest) {
+    public Simulator(int seed, int serverNum, 
+                     int notHumanServerNum, int maxQueueLen, 
+                     int customerNum, double arrivalRate, 
+                     double serviceRate, double restRate, 
+                     double probabilityRest, double probabilityGreedy) {
 
-        this.shop = new Shop(serverNum, maxQueueLen);
+        this.shop = new Shop(serverNum, notHumanServerNum, maxQueueLen);
         
         this.rand = new RandomGenerator(seed, arrivalRate, serviceRate, restRate);
-        this.customerQueue = createCustomerQueue(customerNum);
+        this.customerQueue = createCustomerQueue(customerNum, probabilityGreedy);
         this.eventQueue = new PriorityQueue<>(new EventComparator());
         this.eventSequence = new ArrayList<Event>();
         this.probabilityRest = probabilityRest;
@@ -41,7 +45,7 @@ public class Simulator {
      * @return PriorityQueue of Customer
      */
 
-    public PriorityQueue<Customer> createCustomerQueue(int customerNum) {
+    public PriorityQueue<Customer> createCustomerQueue(int customerNum, double probabilityGreedy) {
 
         CustomerComparator customerComparator = new CustomerComparator();
         PriorityQueue<Customer> customerQueue = new PriorityQueue<Customer>(customerComparator);
@@ -50,6 +54,8 @@ public class Simulator {
 
         for (int i = 0; i < customerNum; i++) {
 
+            boolean isGreedy = (probabilityGreedy > this.rand.genCustomerType()) ? true : false;
+            
             Customer newCustomer;
             Supplier<Double> serviceTime = () -> {
 
@@ -58,11 +64,11 @@ public class Simulator {
 
             if (i == 0) {
 
-                newCustomer = new Customer(i + 1, 0, serviceTime);
+                newCustomer = new Customer(i + 1, 0, serviceTime, isGreedy);
             
             } else {
 
-                newCustomer = new Customer(i + 1, prevStart + this.rand.genInterArrivalTime(), serviceTime);
+                newCustomer = new Customer(i + 1, prevStart + this.rand.genInterArrivalTime(), serviceTime, isGreedy);
                 prevStart = newCustomer.getArrivalTime();
             }
 
@@ -166,41 +172,67 @@ public class Simulator {
 
                     Server updatedServer = latestShop.find(x -> x.getIdentifier() == nextEventServerId).get();
 
-                    boolean serverShouldRest = (this.rand.genRandomRest() < this.probabilityRest);
+                    if (updatedServer instanceof SelfCheckoutServer) {
 
-                    if (serverShouldRest) {
+                        SelfCheckoutServer selfCheckoutServer = (SelfCheckoutServer) updatedServer;
 
-                        double serverRestTime = this.rand.genRestPeriod();
+                        if (Server.sharedWaitingCustomers.size() > 0) {
 
-                        SERVER_REST serverRest = new SERVER_REST(updatedServer.getNextAvailableTime(), 
-                                                                serverRestTime, 
-                                                                nextEvent.getCustomer(), 
-                                                                nextEvent.getServerId());
-                                                                    
-                        this.eventQueue.add(serverRest);
-
-                        if (updatedServer.getWaitingCustomers().size() > 0) {
-
-                            ServeEvent serveEvent = new ServeEvent(nextEvent.getStartTime() + serverRestTime, 
-                                                                   nextEvent.getCustomer(), 
-                                                                   nextEvent.getServerId());
+                            ServeEvent serveEvent = new ServeEvent(nextEvent.getStartTime(),
+                                                                   nextEvent.getCustomer(),
+                                                                   nextEvent.getServerId(),
+                                                                   false,
+                                                                   selfCheckoutServer.getMainId());
                             
                             this.eventQueue.add(serveEvent);
                         }
-                    
+
                     } else {
 
-                        if (updatedServer.getWaitingCustomers().size() > 0) {
+                        boolean serverShouldRest = (this.rand.genRandomRest() < this.probabilityRest);
 
-                            ServeEvent serveEvent = new ServeEvent(nextEvent.getStartTime(), 
-                                                                nextEvent.getCustomer(), 
-                                                                nextEvent.getServerId());
-                            
-                            this.eventQueue.add(serveEvent);
+                        if (serverShouldRest) {
+
+                            double serverRestTime = this.rand.genRestPeriod();
+
+                            SERVER_REST serverRest = new SERVER_REST(updatedServer.getNextAvailableTime(), 
+                                                                    serverRestTime, 
+                                                                    nextEvent.getCustomer(), 
+                                                                    nextEvent.getServerId());
+                                                                        
+                            this.eventQueue.add(serverRest);
+                        
+                        } else {
+
+                            if (updatedServer.getWaitingCustomers().size() > 0) {
+
+                                ServeEvent serveEvent = new ServeEvent(nextEvent.getStartTime(), 
+                                                                       nextEvent.getCustomer(), 
+                                                                       nextEvent.getServerId(), 
+                                                                       true, 
+                                                                       0);
+                                
+                                this.eventQueue.add(serveEvent);
+                            }
                         }
                     }
-                    
-                    
+                }
+
+                if (currentEvent instanceof SERVER_BACK) {
+
+                    Event nextEvent = pair.second();
+                    Server updatedServer = latestShop.find(x -> x.getIdentifier() == nextEvent.getServerId()).get();
+
+                    if (updatedServer.getWaitingCustomers().size() > 0) {
+
+                        ServeEvent serveEvent = new ServeEvent(nextEvent.getStartTime(), 
+                                                               nextEvent.getCustomer(), 
+                                                               nextEvent.getServerId(),
+                                                               true,
+                                                               0); 
+
+                        this.eventQueue.add(serveEvent);
+                    }
                 }
             
             } else {

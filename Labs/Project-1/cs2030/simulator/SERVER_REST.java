@@ -29,7 +29,7 @@ public class SERVER_REST extends Event {
                                                                                    customer, 
                                                                                    serverId));
         
-        }, serviceStartTime, customer, Optional.of(serverId));
+        }, serviceStartTime, customer, Optional.of(serverId), false, 0);
 
     }
 

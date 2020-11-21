@@ -9,6 +9,7 @@ public class Customer {
     private final Supplier<Double> serviceTime;
     private double serviceTimeComputed;
     private boolean isComputed = false;
+    private final boolean isGreedy;
 
     /** Create Customer object.
      * 
@@ -19,12 +20,21 @@ public class Customer {
         this.id = id;
         this.arrivalTime = arrivalTime;
         this.serviceTime = () -> 1.0;
+        this.isGreedy = false;
     }
 
     Customer(int id, double arrivalTime, Supplier<Double> serviceTime) {
         this.id = id;
         this.arrivalTime = arrivalTime;
         this.serviceTime = serviceTime;
+        this.isGreedy = false;
+    }
+
+    Customer(int id, double arrivalTime, Supplier<Double> serviceTime, boolean isGreedy) {
+        this.id = id;
+        this.arrivalTime = arrivalTime;
+        this.serviceTime = serviceTime;
+        this.isGreedy = isGreedy;
     }
 
     /**
@@ -52,9 +62,18 @@ public class Customer {
         }
         return this.serviceTimeComputed;
     }
+
+    public boolean getIsGreedy() {
+        return this.isGreedy;
+    }
     
     @Override
     public String toString() {
-        return String.format("%d arrives at %.1f", this.id, this.arrivalTime);
+
+        if (getIsGreedy()) {
+            return String.format("%d(greedy) arrives at %.1f", this.id, this.arrivalTime);
+        } else {
+            return String.format("%d arrives at %.1f", this.id, this.arrivalTime);
+        }
     }
 }
