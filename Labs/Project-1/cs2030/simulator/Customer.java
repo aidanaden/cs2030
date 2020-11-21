@@ -49,11 +49,14 @@ public class Customer {
      * Get arrival time of Customer.
      * @return Arrival time of Customer.
      */
-
     public double getArrivalTime() {
         return this.arrivalTime;
     }
 
+    /**
+     * Get service time of Customer.
+     * @return Service time of Customer.
+     */
     public double getServiceTime() {
         
         if (!isComputed) {
@@ -63,10 +66,18 @@ public class Customer {
         return this.serviceTimeComputed;
     }
 
+    /**
+     * Get Greedy status of Customer.
+     * @return Greedy status of Customer.
+     */
     public boolean getIsGreedy() {
         return this.isGreedy;
     }
     
+    /**
+     * String output of Customer.
+     * @return String output of Customer.
+     */
     @Override
     public String toString() {
 

@@ -8,9 +8,10 @@ public class SelfCheckoutServer extends Server {
     private final int mainId;
     
     SelfCheckoutServer(int identifier, int mainId, boolean isAvailable, 
-    boolean hasWaitingCustomer, double nextAvailableTime, int maxWaitingCustomers) {
+                       boolean hasWaitingCustomer, double nextAvailableTime, 
+                       int maxWaitingCustomers) {
 
-        super(identifier, isAvailable, hasWaitingCustomer, nextAvailableTime, maxWaitingCustomers);
+        super(identifier, isAvailable, hasWaitingCustomer, nextAvailableTime, maxWaitingCustomers, false);
         this.mainId = mainId;
     }   
 

@@ -11,6 +11,10 @@ public class LeaveEvent extends Event {
         }, startTime, customer, Optional.empty(), true, 0);
     }
 
+    /**
+     * Output string of LeaveEvent.
+     * @return Output string of LeaveEvent.
+     */
     public String toString() {
 
         String baseStr = String.format("%.3f %d", 

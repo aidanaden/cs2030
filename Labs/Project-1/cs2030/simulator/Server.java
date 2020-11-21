@@ -27,7 +27,8 @@ public class Server {
     }
 
     Server(int identifier, boolean isAvailable, 
-    boolean hasWaitingCustomer, double nextAvailableTime, int maxWaitingCustomers) {
+           boolean hasWaitingCustomer, double nextAvailableTime, 
+           int maxWaitingCustomers) {
 
         this.identifier = identifier;
         this.isAvailable = isAvailable;
@@ -39,7 +40,8 @@ public class Server {
     }
 
     Server(int identifier, boolean isAvailable, 
-    boolean hasWaitingCustomer, double nextAvailableTime, int maxWaitingCustomers, boolean isHuman) {
+           boolean hasWaitingCustomer, double nextAvailableTime, 
+           int maxWaitingCustomers, boolean isHuman) {
 
         this.identifier = identifier;
         this.isAvailable = isAvailable;
@@ -51,7 +53,8 @@ public class Server {
     }
 
     Server(int identifier, boolean isAvailable, 
-    boolean hasWaitingCustomer, double nextAvailableTime, List<Customer> waitingCustomers, int maxWaitingCustomers) {
+           boolean hasWaitingCustomer, double nextAvailableTime, 
+           List<Customer> waitingCustomers, int maxWaitingCustomers) {
 
         this.identifier = identifier;
         this.isAvailable = isAvailable;
@@ -62,19 +65,6 @@ public class Server {
         this.waitingCustomers.addAll(waitingCustomers);
         this.isHuman = true;
     }
-
-    // Server(int identifier, boolean isAvailable, 
-    // boolean hasWaitingCustomer, double nextAvailableTime, List<Customer> waitingCustomers, int maxWaitingCustomers, boolean isHuman) {
-
-    //     this.identifier = identifier;
-    //     this.isAvailable = isAvailable;
-    //     this.hasWaitingCustomer = hasWaitingCustomer;
-    //     this.nextAvailableTime = nextAvailableTime;
-    //     this.maxWaitingCustomers = maxWaitingCustomers;
-    //     this.waitingCustomers = new ArrayList<>(maxWaitingCustomers);
-    //     this.waitingCustomers.addAll(waitingCustomers);
-    //     this.isHuman = isHuman;
-    // }
     
     public int getIdentifier() {
         return this.identifier;
@@ -104,6 +94,10 @@ public class Server {
         return maxWaitingCustomers;
     }
 
+    /**
+     * Get number of waiting Customers.
+     * @return Number of waiting Customers.
+     */
     public int getNumWaitingCustomers() {
         if (!isHuman) {
             return Server.sharedWaitingCustomers.size();

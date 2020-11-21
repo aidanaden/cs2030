@@ -159,6 +159,10 @@ public class ArriveEvent extends Event {
         }, customer.getArrivalTime(), customer, Optional.empty(), true, 0);
     }
 
+    /**
+     * Return string version of Arrive Event.
+     * @return toString
+     */
     public String toString() {
 
         String baseStr = String.format("%.3f %d", 

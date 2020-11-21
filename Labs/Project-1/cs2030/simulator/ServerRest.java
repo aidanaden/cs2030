@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class SERVER_REST extends Event {
+public class ServerRest extends Event {
     
-    SERVER_REST(double serviceStartTime, double serverRestTime, Customer customer, int serverId) {
+    ServerRest(double serviceStartTime, double serverRestTime, Customer customer, int serverId) {
 
         super(x -> {
 

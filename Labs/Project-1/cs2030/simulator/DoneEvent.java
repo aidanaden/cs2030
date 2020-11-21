@@ -100,6 +100,10 @@ public class DoneEvent extends Event {
         }, serviceStartTime, customer, Optional.of(serverId), isHuman, serverMainId);
     }
 
+    /**
+     * String output of DoneEvent.
+     * @return String output of DoneEvent.
+     */
     public String toString() {
 
         String baseStr = String.format("%.3f %d", 

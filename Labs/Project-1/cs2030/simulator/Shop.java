@@ -47,12 +47,21 @@ public class Shop {
         this.servers.addAll(notHumanServers);
     }
 
+    /**
+     * Find Server in Shop using provided Predicate.
+     * @return Server found using Predicate.
+     */
     public Optional<Server> find(Predicate<Server> pred) {
         
         Optional<Server> availableServer = servers.stream().filter(pred).findFirst();
         return availableServer;
     }
 
+    /**
+     * Replace Server with Updated Server.
+     * @param s Updated Server
+     * @return Updated Shop
+     */
     public Shop replace(Server s) {
 
         Optional<Server> selectedServer = servers.stream().filter(x -> x.getIdentifier() == s.getIdentifier()).findFirst();
@@ -73,9 +82,13 @@ public class Shop {
         return replacedShop;
     }
 
+    /**
+     * Find Server with the fewest Customers waiting in line.
+     * @return Return Server with fewest customers in line. 
+     */
     public Optional<Server> getShortestQueue() {
 
-        Server shortestServer = this.servers.stream().min(new GreedyServerComparator()).get();
+        Server shortestServer = this.servers.stream().min(Comparator.comparingInt(Server::getNumWaitingCustomers)).get();
 
         if (shortestServer.getNumWaitingCustomers() < shortestServer.getMaxWaitingCustomers()) {
             return Optional.ofNullable(shortestServer);

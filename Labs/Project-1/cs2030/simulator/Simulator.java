@@ -20,8 +20,15 @@ public class Simulator {
      * Create a Simulator object simulating a sequence of 
      * Customers and a list of Servers serving them.
      * 
-     * @param arriveStartTimes Arrive times of the Customers.
-     * @param serverNum Number of Servers serving the Customers.
+     * @param seed Seed value of Random Generator.
+     * @param serverNum Number of servers.
+     * @param notHumanServerNum Number of self checkout servers.
+     * @param maxQueueLen Maximum number of customers in a queue.
+     * @param customerNum Number of customers.
+     * @param arrivalRate Rate of customers arrival times.
+     * @param serviceRate Rate of customers service times.
+     * @param restRate Rate of server resting.
+     * @param probabilityRest Probability of server resting.
      */
     public Simulator(int seed, int serverNum, 
                      int notHumanServerNum, int maxQueueLen, 
@@ -38,13 +45,14 @@ public class Simulator {
         this.probabilityRest = probabilityRest;
     }
 
-	/**
+    /**
      * Create a queue of Customer objects from the 
      * provided list of Arrive times.
-     * @param arriveTimes Provided arrive times of the Customers.
+     * 
+     * @param customerNum Number of customers.
+     * @param probabilityGreedy Probability that customer is greedy.
      * @return PriorityQueue of Customer
      */
-
     public PriorityQueue<Customer> createCustomerQueue(int customerNum, double probabilityGreedy) {
 
         CustomerComparator customerComparator = new CustomerComparator();
@@ -80,7 +88,7 @@ public class Simulator {
 
     /**
      * Create ArriveEvent for each Customer.
-     * @param servers List of Servers.
+     * 
      * @return ArriveEvent for a Customer.
      */
     public Event createArriveEvent() {
@@ -100,9 +108,9 @@ public class Simulator {
 
         // this.eventSequence.add(event);
         
-        if ((event instanceof SERVER_REST) == false) {
+        if ((event instanceof ServerRest) == false) {
 
-            if ((event instanceof SERVER_BACK) == false) {
+            if ((event instanceof ServerBack) == false) {
 
                 this.eventSequence.add(event);
             }
@@ -159,7 +167,7 @@ public class Simulator {
 
                     if ((currentEvent instanceof WaitEvent) == false) {
 
-                        if ((currentEvent instanceof SERVER_BACK) == false) {
+                        if ((currentEvent instanceof ServerBack) == false) {
 
                             this.eventQueue.add(pair.second());
                         }
@@ -195,7 +203,7 @@ public class Simulator {
 
                             double serverRestTime = this.rand.genRestPeriod();
 
-                            SERVER_REST serverRest = new SERVER_REST(updatedServer.getNextAvailableTime(), 
+                            ServerRest serverRest = new ServerRest(updatedServer.getNextAvailableTime(), 
                                                                     serverRestTime, 
                                                                     nextEvent.getCustomer(), 
                                                                     nextEvent.getServerId());
@@ -218,7 +226,7 @@ public class Simulator {
                     }
                 }
 
-                if (currentEvent instanceof SERVER_BACK) {
+                if (currentEvent instanceof ServerBack) {
 
                     Event nextEvent = pair.second();
                     Server updatedServer = latestShop.find(x -> x.getIdentifier() == nextEvent.getServerId()).get();

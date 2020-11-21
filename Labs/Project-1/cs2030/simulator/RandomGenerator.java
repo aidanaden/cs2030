@@ -2,8 +2,8 @@ package cs2030.simulator;
 
 import java.util.Random;
 
-public class RandomGenerator
-{
+public class RandomGenerator {
+    
     private final Random rngArrival;
     private final Random rngService;
     private final Random rngRest;

@@ -60,6 +60,10 @@ public class ServeEvent extends Event {
         }, serviceStartTime, customer, Optional.of(serverId), isHuman, serverMainId);
     }
 
+    /**
+     * Output string of ServeEvent.
+     * @return Output string of ServeEvent.
+     */
     public String toString() {
 
         String baseStr = String.format("%.3f %d", 

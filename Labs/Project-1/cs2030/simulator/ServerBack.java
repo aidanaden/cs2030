@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class SERVER_BACK extends Event {
+public class ServerBack extends Event {
 
-    SERVER_BACK(double serviceStartTime, boolean serverPreviousAvailable, Customer customer, int serverId) {
+    ServerBack(double serviceStartTime, boolean serverPreviousAvailable, Customer customer, int serverId) {
 
         super(x -> {
 
@@ -30,7 +30,7 @@ public class SERVER_BACK extends Event {
                                                                                  false,
                                                                                  0));
         
-        }, serviceStartTime, customer, Optional.of(serverId), false , 0);
+        }, serviceStartTime, customer, Optional.of(serverId), false, 0);
 
     }
 

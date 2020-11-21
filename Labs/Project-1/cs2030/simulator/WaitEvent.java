@@ -55,6 +55,10 @@ public class WaitEvent extends Event {
         }, arriveTime, customer, Optional.of(serverId), isHuman, serverMainId);
     }
 
+    /**
+     * String output of WaitEvent.
+     * @return String output of WaitEvent.
+     */
     public String toString() {
 
         String baseStr = String.format("%.3f %d", 
